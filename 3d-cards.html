@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floating Sports Cards 3D</title>
+    <style>
+        body {
+            margin: 0;
+            overflow-y: scroll;
+            font-family: Arial, sans-serif;
+            background: #0a0a0a;
+        }
+        #container {
+            width: 100%;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+        #info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            z-index: 100;
+            font-size: 14px;
+        }
+        #scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.6);
+            z-index: 100;
+            font-size: 12px;
+            text-align: center;
+        }
+        .arrow {
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <script>
+        let container, camera, scene, renderer;
+        const cards = [];
+        let scrollY = 0;
+        let targetScrollY = 0;
+        
+        // ANIMATION SPEED CONTROL
+        // Adjust this value to control overall animation speed:
+        // 1.0 = normal speed
+        // 2.0 = twice as fast
+        // 0.5 = half speed
+        const ANIMATION_SPEED = 0.5;
+        
+        init();
+        animate();
+        
+        function init() {
+            container = document.getElementById('container');
+            
+            // Camera setup
+            camera = new THREE.PerspectiveCamera(
+                60,
+                window.innerWidth / window.innerHeight,
+                0.01,
+                100
+            );
+            camera.position.z = 8;
+            
+            // Scene setup
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0a0a);
+            
+            // Add ambient light
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            
+            // Add directional light
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(5, 5, 5);
+            scene.add(directionalLight);
+            
+            // Create cards
+            const cardGeometry = new THREE.BoxGeometry(1.5, 2.1, 0.02); // Thick card with depth
+            
+            // Array of card image paths
+            const cardImages = [
+                'assets/Gretzky OPC front.jpg',
+                'assets/Henderson Topps front.jpg',
+                'assets/Jordan Fleer front.jpg',
+                'assets/Jordan Star front.jpg',
+                'assets/Kiss Comic Front.jpg',
+                'assets/Tiger Woods Front.jpg',
+                'assets/Trout Bowman Auto front.jpg'
+            ];
+            
+            // Texture loader
+            const textureLoader = new THREE.TextureLoader();
+            
+            // Load back texture once for all cards
+            const backTexture = textureLoader.load('assets/back.png');
+            
+            for (let i = 0; i < 30; i++) {
+                // Select card image (cycle through available images)
+                const imagePath = cardImages[i % cardImages.length];
+                const frontTexture = textureLoader.load(imagePath);
+                
+                // Create materials array for box faces: [right, left, top, bottom, front, back]
+                const materials = [
+                    // Right side (edge)
+                    new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.3, roughness: 0.4 }),
+                    // Left side (edge)
+                    new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.3, roughness: 0.4 }),
+                    // Top (edge)
+                    new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.3, roughness: 0.4 }),
+                    // Bottom (edge)
+                    new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.3, roughness: 0.4 }),
+                    // Front (face)
+                    new THREE.MeshStandardMaterial({
+                        map: frontTexture,
+                        metalness: 0.3,
+                        roughness: 0.4
+                    }),
+                    // Back (face)
+                    new THREE.MeshStandardMaterial({
+                        map: backTexture,
+                        metalness: 0.3,
+                        roughness: 0.4
+                    })
+                ];
+                
+                const card = new THREE.Mesh(cardGeometry, materials);
+                
+                // Layered Z-positioning to prevent collisions
+                const numLayers = 6;
+                const layerDepth = 12 / numLayers;
+                const layer = i % numLayers;
+                const zPosition = layer * layerDepth - 6;
+                
+                // Position validation - ensure minimum distance from existing cards
+                let validPosition = false;
+                let attempts = 0;
+                let posX, posY;
+                
+                while (!validPosition && attempts < 50) {
+                    posX = Math.random() * 20 - 10;
+                    posY = Math.random() * 20 - 10;
+                    
+                    validPosition = true;
+                    const minDistance = 3.5; // Minimum distance between cards
+                    
+                    // Check distance from all existing cards
+                    for (let j = 0; j < cards.length; j++) {
+                        const existingCard = cards[j];
+                        const dx = posX - existingCard.position.x;
+                        const dy = posY - existingCard.position.y;
+                        const dz = zPosition - existingCard.position.z;
+                        const distance = Math.sqrt(dx*dx + dy*dy + dz*dz);
+                        
+                        if (distance < minDistance) {
+                            validPosition = false;
+                            break;
+                        }
+                    }
+                    attempts++;
+                }
+                
+                card.position.x = posX;
+                card.position.y = posY;
+                card.position.z = zPosition;
+                
+                // Random initial rotation
+                card.rotation.x = Math.random() * Math.PI;
+                card.rotation.y = Math.random() * Math.PI;
+                card.rotation.z = Math.random() * Math.PI;
+                
+                // Store random movement parameters with layer info
+                card.userData = {
+                    speedX: (Math.random() * 0.015 + 0.005) * ANIMATION_SPEED,
+                    speedY: (Math.random() * 0.015 + 0.005) * ANIMATION_SPEED,
+                    rotationSpeed: (Math.random() * 0.005 + 0.002) * ANIMATION_SPEED,
+                    initialY: card.position.y,
+                    layer: layer,
+                    zPosition: zPosition
+                };
+                
+                scene.add(card);
+                cards.push(card);
+            }
+            
+            // Renderer setup
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+            
+            // Event listeners
+            window.addEventListener('resize', onWindowResize);
+            window.addEventListener('scroll', onScroll);
+        }
+        
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
+        function onScroll() {
+            targetScrollY = window.scrollY;
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            const timer = 0.000005 * ANIMATION_SPEED * Date.now(); // Time progression controlled by speed
+            
+            // Smooth scroll interpolation
+            scrollY += (targetScrollY - scrollY) * 0.05;
+            const scrollProgress = scrollY * 0.0005; // Reduced scroll influence
+            
+            // Update each card
+            for (let i = 0; i < cards.length; i++) {
+                const card = cards[i];
+                const userData = card.userData;
+                
+                // Circular motion with layer-based orbit radius
+                const baseRadiusX = 5 + userData.layer * 0.5;
+                const baseRadiusY = 4 + userData.layer * 0.4;
+                const radiusX = baseRadiusX + scrollProgress * 2;
+                const radiusY = baseRadiusY + scrollProgress * 1.5;
+                
+                card.position.x = radiusX * Math.cos(timer * userData.speedX + i);
+                card.position.y = userData.initialY + radiusY * Math.sin(timer * userData.speedY + i * 1.1) + scrollProgress * 5;
+                card.position.z = userData.zPosition; // Keep card in its layer
+                
+                // Rotation affected by scroll
+                card.rotation.x += userData.rotationSpeed * (1 + scrollProgress * 0.5);
+                card.rotation.y += userData.rotationSpeed * 0.7 * (1 + scrollProgress * 0.3);
+                card.rotation.z = Math.sin(timer + i) * 0.2 + scrollProgress * 0.1;
+            }
+            
+            // Camera movement based on scroll
+            camera.position.y = -scrollProgress * 3;
+            camera.position.z = 8 - scrollProgress * 2;
+            camera.lookAt(0, -scrollProgress * 3, 0);
+            
+            renderer.render(scene, camera);
+        }
+    </script>
+</body>
+</html>

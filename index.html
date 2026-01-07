@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OnlyGoatz</title>
+  <style data-shopify>
+    @font-face {
+      font-family: Inter;
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+      src: url("//onlygoatz.com/cdn/fonts/inter/inter_n7.02711e6b374660cfc7915d1afc1c204e633421e4.woff2") format("woff2"),
+           url("//onlygoatz.com/cdn/fonts/inter/inter_n7.6dab87426f6b8813070abd79972ceaf2f8d3b012.woff") format("woff");
+    }
+    @font-face {
+      font-family: Inter;
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
+      src: url("//onlygoatz.com/cdn/fonts/inter/inter_n5.d7101d5e168594dd06f56f290dd759fba5431d97.woff2") format("woff2"),
+           url("//onlygoatz.com/cdn/fonts/inter/inter_n5.5332a76bbd27da00474c136abb1ca3cbbf259068.woff") format("woff");
+    }
+  </style>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Inter, sans-serif;
+      margin: 0;
+      overflow-y: scroll;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 32px;
+      background-color: #ffffff;
+      border-bottom: 1px solid #e5e5e5;
+      position: relative;
+      z-index: 10;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+    }
+
+    .logo {
+      height: 40px;
+    }
+
+    nav {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: #171717;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    nav a:hover {
+      color: #666666;
+    }
+
+    .search-icon {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    .hero {
+      position: relative;
+      width: 100%;
+      height: 600px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding: 48px;
+      overflow: hidden;
+      z-index: 5;
+    }
+
+    .hero-content-left {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .hero-text {
+      font-size: 48px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    .hero-button {
+      padding: 14px 32px;
+      background-color: #fff;
+      color: #000;
+      border: none;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .hero-button:hover {
+      background-color: #333333;
+    }
+
+    #container {
+      width: 100%;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #0a0a0a;
+      z-index: -1;
+    }
+
+    .collage {
+      position: relative;
+      z-index: 5;
+      padding: 80px 48px;
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      gap: 60px;
+      align-items: flex-start;
+    }
+
+    .title-wrapper {
+      flex: 0 0 40%;
+      min-width: 300px;
+    }
+
+    .heading {
+      font-size: 48px;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.2;
+      margin: 0;
+      position: relative;
+    }
+
+    .highlighted-text {
+      position: relative;
+      font-style: normal;
+      display: inline-block;
+    }
+
+    .icon-basic-underline {
+      width: 150px;
+      height: 40px;
+      position: absolute;
+      bottom: -10px;
+      left: 0;
+      stroke: #ffffff;
+    }
+
+    .rich-text {
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .rte {
+      font-size: 16px;
+      line-height: 1.8;
+      color: #cccccc;
+    }
+
+    .rte p {
+      margin: 0;
+    }
+
+    .rte strong {
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .rte em {
+      font-style: italic;
+      color: #ffffff;
+    }
+
+    @media (max-width: 768px) {
+      header {
+        padding: 12px 16px;
+      }
+
+      .header-left {
+        gap: 20px;
+        width: 100%;
+      }
+
+      .logo {
+        height: 32px;
+      }
+
+      nav {
+        gap: 16px;
+        flex-wrap: wrap;
+        font-size: 12px;
+      }
+
+      .hero {
+        height: 400px;
+        padding: 24px;
+        flex-direction: column;
+        justify-content: flex-end;
+        gap: 20px;
+      }
+
+      .hero-text {
+        font-size: 32px;
+      }
+
+      .collage {
+        flex-direction: column;
+        gap: 40px;
+        padding: 40px 24px;
+      }
+
+      .title-wrapper {
+        flex: 1;
+        min-width: unset;
+      }
+
+      .heading {
+        font-size: 32px;
+      }
+
+      .icon-basic-underline {
+        width: 120px;
+        height: 35px;
+        bottom: -8px;
+      }
+
+      .rich-text {
+        min-width: unset;
+      }
+
+      .rte {
+        font-size: 16px;
+      }
+
+      .reviews-section {
+        padding: 40px 24px;
+      }
+
+      .quote-mark {
+        font-size: 100px;
+        margin-bottom: 15px;
+      }
+
+      .review-text {
+        font-size: 18px;
+        min-height: 70px;
+      }
+
+      .carousel-dots {
+        margin-bottom: 15px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      header {
+        padding: 12px 12px;
+      }
+
+      .header-left {
+        gap: 12px;
+      }
+
+      nav {
+        gap: 8px;
+        font-size: 12px;
+      }
+
+      nav a {
+        padding: 4px 6px;
+      }
+
+      .hero {
+        height: 300px;
+        padding: 16px;
+      }
+
+      .hero-text {
+        font-size: 28px;
+      }
+
+      .hero-button {
+        padding: 12px 24px;
+        font-size: 14px;
+      }
+
+      .collage {
+        padding: 30px 16px;
+        gap: 30px;
+      }
+
+      .heading {
+        font-size: 26px;
+      }
+
+      .icon-basic-underline {
+        width: 90px;
+        height: 28px;
+      }
+
+      .reviews-section {
+        padding: 30px 16px;
+      }
+
+      .quote-mark {
+        font-size: 80px;
+      }
+
+      .review-text {
+        font-size: 16px;
+        min-height: 60px;
+      }
+
+      .dot {
+        width: 8px;
+        height: 8px;
+      }
+    }
+
+    .reviews-section {
+      position: relative;
+      z-index: 5;
+      padding: 80px 48px;
+      max-width: 1000px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .reviews-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .quote-mark {
+      font-size: 120px;
+      color: rgba(255, 255, 255);
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 20px;
+    }
+
+    .review-text {
+      font-size: 20px;
+      font-weight: 500;
+      color: #ffffff;
+      line-height: 1.6;
+      margin-bottom: 40px;
+      min-height: 80px;
+      max-width: 700px;
+    }
+
+    .carousel-dots {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .dot.active {
+      background-color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+  <div id="container"></div>
+
+  <header>
+    <div class="header-left">
+      <img src="assets/logo.png" alt="OnlyGoatz Logo" class="logo">
+      <nav>
+        <a href="#home">Home</a>
+        <a href="#shop">Shop</a>
+        <a href="#sell">Sell Your Cards</a>
+        <a href="#events">Events</a>
+        <a href="#help">Help Center</a>
+        <a href="#news">News</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+    <div class="search">
+      <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+      </svg>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-content-left">
+      <div class="hero-text">
+        <div>Unbox the legends</div>
+        <div>Discover your GOAT</div>
+      </div>
+    </div>
+    <button class="hero-button">Shop Now</button>
+  </section>
+
+  <div class="collage">
+    <div class="title-wrapper">
+      <h2 class="heading">
+        Why <span class="highlighted-text">ONLYGOATZ<svg class="icon-basic-underline" viewBox="-400 -55 730 60" stroke="currentColor" fill="none" role="presentation" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-width="30" pathLength="1" d="m -383.25 -6 c 55.25 -22 130.75 -33.5 293.25 -38 c 54.5 -0.5 195 -2.5 401 15"></path>
+        </svg></span>?
+      </h2>
+    </div>
+    <div class="rich-text">
+      <div class="rte">
+        <p>Welcome to <strong>ONLYGOATZ.COM</strong>, "<em>Where Sports Icons Live Forever.</em>" With over 30 years of experience in the sports card industry, we specialize in bringing you the most sought-after collectibles featuring the greatest athletes of all time. Our commitment to quality ensures that every card you purchase is a piece of history, meticulously curated for true sports enthusiasts.</p>
+      </div>
+    </div>
+  </div>
+
+  <section class="reviews-section">
+    <div class="reviews-container">
+      <div class="quote-mark">"</div>
+      <div class="review-text" id="review-text">Adam is amazing to work with. Honest and a man of his word. And The Hair!!</div>
+      <div class="carousel-dots">
+        <span class="dot active" onclick="showReview(0)"></span>
+        <span class="dot" onclick="showReview(1)"></span>
+        <span class="dot" onclick="showReview(2)"></span>
+      </div>
+    </div>
+  </section>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  
+  <script>
+    let container, camera, scene, renderer;
+    const cards = [];
+    let scrollY = 0;
+    let targetScrollY = 0;
+    
+    const ANIMATION_SPEED = 0.5;
+    
+    init();
+    animate();
+    
+    function init() {
+      container = document.getElementById('container');
+      
+      camera = new THREE.PerspectiveCamera(
+        60,
+        window.innerWidth / window.innerHeight,
+        0.01,
+        100
+      );
+      camera.position.z = 8;
+      
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x0a0a0a);
+      
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+      scene.add(ambientLight);
+      
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      directionalLight.position.set(5, 5, 5);
+      scene.add(directionalLight);
+      
+      const cardGeometry = new THREE.BoxGeometry(1.5, 2.1, 0.02);
+      
+      const cardImages = [
+        'assets/Gretzky OPC front.jpg',
+        'assets/Henderson Topps front.jpg',
+        'assets/Jordan Fleer front.jpg',
+        'assets/Jordan Star front.jpg',
+        'assets/Kiss Comic Front.jpg',
+        'assets/Tiger Woods Front.jpg',
+        'assets/Trout Bowman Auto front.jpg'
+      ];
+      
+      const textureLoader = new THREE.TextureLoader();
+      const backTexture = textureLoader.load('assets/back.png');
+      
+      for (let i = 0; i < 30; i++) {
+        const imagePath = cardImages[i % cardImages.length];
+        const frontTexture = textureLoader.load(imagePath);
+        
+        const materials = [
+          new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.3, roughness: 0.4 }),
+          new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.3, roughness: 0.4 }),
+          new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.3, roughness: 0.4 }),
+          new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.3, roughness: 0.4 }),
+          new THREE.MeshStandardMaterial({
+            map: frontTexture,
+            metalness: 0.3,
+            roughness: 0.4
+          }),
+          new THREE.MeshStandardMaterial({
+            map: backTexture,
+            metalness: 0.3,
+            roughness: 0.4
+          })
+        ];
+        
+        const card = new THREE.Mesh(cardGeometry, materials);
+        
+        const numLayers = 6;
+        const layerDepth = 12 / numLayers;
+        const layer = i % numLayers;
+        const zPosition = layer * layerDepth - 6;
+        
+        let validPosition = false;
+        let attempts = 0;
+        let posX, posY;
+        
+        while (!validPosition && attempts < 50) {
+          posX = Math.random() * 20 - 10;
+          posY = Math.random() * 20 - 10;
+          
+          validPosition = true;
+          const minDistance = 3.5;
+          
+          for (let j = 0; j < cards.length; j++) {
+            const existingCard = cards[j];
+            const dx = posX - existingCard.position.x;
+            const dy = posY - existingCard.position.y;
+            const dz = zPosition - existingCard.position.z;
+            const distance = Math.sqrt(dx*dx + dy*dy + dz*dz);
+            
+            if (distance < minDistance) {
+              validPosition = false;
+              break;
+            }
+          }
+          attempts++;
+        }
+        
+        card.position.x = posX;
+        card.position.y = posY;
+        card.position.z = zPosition;
+        
+        card.rotation.x = Math.random() * Math.PI;
+        card.rotation.y = Math.random() * Math.PI;
+        card.rotation.z = Math.random() * Math.PI;
+        
+        card.userData = {
+          speedX: (Math.random() * 0.015 + 0.005) * ANIMATION_SPEED,
+          speedY: (Math.random() * 0.015 + 0.005) * ANIMATION_SPEED,
+          rotationSpeed: (Math.random() * 0.005 + 0.002) * ANIMATION_SPEED,
+          initialY: card.position.y,
+          layer: layer,
+          zPosition: zPosition
+        };
+        
+        scene.add(card);
+        cards.push(card);
+      }
+      
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      container.appendChild(renderer.domElement);
+      
+      window.addEventListener('resize', onWindowResize);
+      window.addEventListener('scroll', onScroll);
+    }
+    
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+    
+    function onScroll() {
+      targetScrollY = window.scrollY;
+    }
+    
+    function animate() {
+      requestAnimationFrame(animate);
+      
+      const timer = 0.000005 * ANIMATION_SPEED * Date.now();
+      
+      scrollY += (targetScrollY - scrollY) * 0.05;
+      const scrollProgress = scrollY * 0.0005;
+      
+      for (let i = 0; i < cards.length; i++) {
+        const card = cards[i];
+        const userData = card.userData;
+        
+        const baseRadiusX = 5 + userData.layer * 0.5;
+        const baseRadiusY = 4 + userData.layer * 0.4;
+        const radiusX = baseRadiusX + scrollProgress * 2;
+        const radiusY = baseRadiusY + scrollProgress * 1.5;
+        
+        card.position.x = radiusX * Math.cos(timer * userData.speedX + i);
+        card.position.y = userData.initialY + radiusY * Math.sin(timer * userData.speedY + i * 1.1) + scrollProgress * 5;
+        card.position.z = userData.zPosition;
+        
+        card.rotation.x += userData.rotationSpeed * (1 + scrollProgress * 0.5);
+        card.rotation.y += userData.rotationSpeed * 0.7 * (1 + scrollProgress * 0.3);
+        card.rotation.z = Math.sin(timer + i) * 0.2 + scrollProgress * 0.1;
+      }
+      
+      camera.position.y = -scrollProgress * 3;
+      camera.position.z = 8 - scrollProgress * 2;
+      camera.lookAt(0, -scrollProgress * 3, 0);
+      
+      renderer.render(scene, camera);
+    }
+
+    const reviews = [
+      "Adam is amazing to work with. Honest and a man of his word. And The Hair!!",
+      "Great seller, great communication, fast delivery, and great card!! I would highly recommend. A++++ This is one of the top sellers I've experienced.",
+      "Great and wonderful! Item came in high-quality condition. Adam is very nice, and I highly enjoyed doing business with them."
+    ];
+
+    let currentReview = 0;
+
+    function showReview(index) {
+      currentReview = index;
+      document.getElementById('review-text').textContent = reviews[index];
+      
+      const dots = document.querySelectorAll('.dot');
+      dots.forEach((dot, i) => {
+        if (i === index) {
+          dot.classList.add('active');
+        } else {
+          dot.classList.remove('active');
+        }
+      });
+    }
+
+    // Auto-advance carousel every 3 seconds
+    setInterval(() => {
+      currentReview = (currentReview + 1) % reviews.length;
+      showReview(currentReview);
+    }, 3000);
+  </script>
+</body>
+</html>
