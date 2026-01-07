@@ -400,6 +400,12 @@
     .dot.active {
       background-color: #ffffff;
     }
+
+    .scrollable-area {
+      height: 300vh;
+      position: relative;
+      z-index: 5;
+    }
   </style>
 </head>
 <body>
@@ -666,5 +672,7 @@
       showReview(currentReview);
     }, 3000);
   </script>
+
+  <div class="scrollable-area"></div>
 </body>
 </html>
