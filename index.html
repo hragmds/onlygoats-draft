@@ -570,39 +570,6 @@
     init();
     animate();
     
-    // Helper function to create canvas texture with text
-    function createTextTexture(text, bgColor) {
-      const canvas = document.createElement('canvas');
-      const CARD_ASPECT_RATIO = 2.1 / 1.5; // Height / Width from card geometry
-      canvas.width = 512;
-      canvas.height = Math.round(canvas.width * CARD_ASPECT_RATIO); // Calculate proportional height
-      const ctx = canvas.getContext('2d');
-      
-      // Background
-      ctx.fillStyle = bgColor;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
-      // Border
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 8;
-      ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
-      
-      // Text
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 48px Inter, Arial, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(text.toUpperCase(), canvas.width / 2, canvas.height / 2);
-      
-      // Subtitle
-      ctx.font = '24px Inter, Arial, sans-serif';
-      const subtitleOffset = canvas.height * 0.084; // Proportional offset (~60px for 716px height)
-      ctx.fillText('CATEGORY', canvas.width / 2, canvas.height / 2 + subtitleOffset);
-      
-      const texture = new THREE.CanvasTexture(canvas);
-      return texture;
-    }
-    
     function init() {
       container = document.getElementById('container');
       
@@ -717,19 +684,20 @@
       
       // Create category cards
       const categories = [
-        { name: 'Baseball', color: '#e74c3c' },
-        { name: 'Basketball', color: '#e67e22' },
-        { name: 'Hockey', color: '#3498db' },
-        { name: 'Golf', color: '#27ae60' },
-        { name: 'Football', color: '#9b59b6' }
+        { name: 'Baseball', image: 'assets/Baseball-Category.jpg' },
+        { name: 'Basketball', image: 'assets/Basketball-Category.jpg' },
+        { name: 'Hockey', image: 'assets/Hockey-Category.jpg' },
+        { name: 'Golf', image: 'assets/Golf-Category.jpg' },
+        { name: 'Football', image: 'assets/Football-Category.jpg' }
       ];
       
       const categoryGeometry = new THREE.BoxGeometry(1.5, 2.1, 0.02);
+      const categoryBackTexture = textureLoader.load('assets/Category-back.jpg');
       const spacing = 2.5; // Space between cards
       const startX = -(categories.length - 1) * spacing / 2;
       
       categories.forEach((category, i) => {
-        const frontTexture = createTextTexture(category.name, category.color);
+        const frontTexture = textureLoader.load(category.image);
         
         const materials = [
           new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.3, roughness: 0.4 }),
@@ -742,7 +710,7 @@
             roughness: 0.4
           }),
           new THREE.MeshStandardMaterial({
-            map: backTexture,
+            map: categoryBackTexture,
             metalness: 0.3,
             roughness: 0.4
           })
