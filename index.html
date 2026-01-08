@@ -476,7 +476,14 @@
     let scrollY = 0;
     let targetScrollY = 0;
     
+    // Mouse parallax variables
+    let mouseX = 0;
+    let mouseY = 0;
+    let targetCameraX = 0;
+    let targetCameraY = 0;
+    
     const ANIMATION_SPEED = 0.5;
+    const MOUSE_INFLUENCE = 0.02; // How much the mouse affects camera position
     
     init();
     animate();
@@ -599,6 +606,13 @@
       
       window.addEventListener('resize', onWindowResize);
       window.addEventListener('scroll', onScroll);
+      window.addEventListener('mousemove', onMouseMove);
+    }
+    
+    function onMouseMove(event) {
+      // Normalize mouse position to -1 to 1 range
+      mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+      mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
     }
     
     function onWindowResize() {
@@ -637,7 +651,12 @@
         card.rotation.z = Math.sin(timer + i) * 0.2 + scrollProgress * 0.1;
       }
       
-      camera.position.y = -scrollProgress * 3;
+      // Smoothly interpolate camera position based on mouse
+      targetCameraX += (mouseX * MOUSE_INFLUENCE - targetCameraX) * 0.05;
+      targetCameraY += (mouseY * MOUSE_INFLUENCE - targetCameraY) * 0.05;
+      
+      camera.position.x = targetCameraX;
+      camera.position.y = -scrollProgress * 3 + targetCameraY;
       camera.position.z = 8 - scrollProgress * 2;
       camera.lookAt(0, -scrollProgress * 3, 0);
       
