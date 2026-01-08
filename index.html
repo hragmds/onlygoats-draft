@@ -553,6 +553,16 @@
     const CATEGORY_ENTER_THRESHOLD_RATIO = 0.3; // Viewport height ratio for card appearance
     const CATEGORY_LEAVE_THRESHOLD_RATIO = 0.5; // Viewport height ratio for float-away trigger
     
+    // Float-away animation parameters
+    const CATEGORY_SCROLL_RADIUS_MULTIPLIER = 2; // Regular scroll radius expansion
+    const CATEGORY_AWAY_RADIUS_X_MULTIPLIER = 3; // Away progress X-radius expansion
+    const CATEGORY_AWAY_RADIUS_Y_MULTIPLIER = 2; // Away progress Y-radius expansion
+    const CATEGORY_ORBITAL_SPEED_X = 2; // Orbital motion X speed factor
+    const CATEGORY_ORBITAL_SPEED_Y = 2.2; // Orbital motion Y speed factor
+    const CATEGORY_AWAY_Y_OFFSET = 10; // Vertical offset during float-away
+    const CATEGORY_Z_SPACING = 2; // Z-axis spacing per layer
+    const CATEGORY_Z_OFFSET = -6; // Base Z-axis offset
+    
     // Category animation thresholds
     let categorySectionTop = 0;
     let categorySectionBottom = 0;
@@ -867,12 +877,12 @@
           const awayProgress = (scrollY - categoryFixedEnd) * CATEGORY_AWAY_PROGRESS_FACTOR;
           const baseRadiusX = CATEGORY_BASE_RADIUS_X + (i % CATEGORY_LAYER_COUNT) * CATEGORY_RADIUS_INCREMENT_X;
           const baseRadiusY = CATEGORY_BASE_RADIUS_Y + (i % CATEGORY_LAYER_COUNT) * CATEGORY_RADIUS_INCREMENT_Y;
-          const radiusX = baseRadiusX + scrollProgress * 2 + awayProgress * 3;
-          const radiusY = baseRadiusY + scrollProgress * 1.5 + awayProgress * 2;
+          const radiusX = baseRadiusX + scrollProgress * CATEGORY_SCROLL_RADIUS_MULTIPLIER + awayProgress * CATEGORY_AWAY_RADIUS_X_MULTIPLIER;
+          const radiusY = baseRadiusY + scrollProgress * (CATEGORY_SCROLL_RADIUS_MULTIPLIER * 0.75) + awayProgress * CATEGORY_AWAY_RADIUS_Y_MULTIPLIER;
           
-          card.position.x = radiusX * Math.cos(timer * userData.speedX + i * 2);
-          card.position.y = radiusY * Math.sin(timer * userData.speedY + i * 2.2) + awayProgress * 10;
-          card.position.z = (i % CATEGORY_LAYER_COUNT) * 2 - 6;
+          card.position.x = radiusX * Math.cos(timer * userData.speedX + i * CATEGORY_ORBITAL_SPEED_X);
+          card.position.y = radiusY * Math.sin(timer * userData.speedY + i * CATEGORY_ORBITAL_SPEED_Y) + awayProgress * CATEGORY_AWAY_Y_OFFSET;
+          card.position.z = (i % CATEGORY_LAYER_COUNT) * CATEGORY_Z_SPACING + CATEGORY_Z_OFFSET;
           
           // Rotate as it floats away
           card.rotation.x += userData.rotationSpeed * (1 + awayProgress);
