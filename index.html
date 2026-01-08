@@ -516,6 +516,9 @@
   <section class="categories-section" id="categories-section">
     <h2 class="categories-title">Explore Our Categories</h2>
     <p class="categories-description">Discover legendary cards across all major sports. Each category features the greatest athletes who have defined their sport.</p>
+    <noscript>
+      <p style="color: #cccccc; margin-top: 40px;">JavaScript is required to view the interactive 3D category cards. Please enable JavaScript in your browser.</p>
+    </noscript>
   </section>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -558,8 +561,9 @@
     // Helper function to create canvas texture with text
     function createTextTexture(text, bgColor) {
       const canvas = document.createElement('canvas');
+      const CARD_ASPECT_RATIO = 2.1 / 1.5; // Height / Width from card geometry
       canvas.width = 512;
-      canvas.height = 716; // Maintain card aspect ratio
+      canvas.height = Math.round(canvas.width * CARD_ASPECT_RATIO); // Calculate proportional height
       const ctx = canvas.getContext('2d');
       
       // Background
@@ -580,7 +584,8 @@
       
       // Subtitle
       ctx.font = '24px Inter, Arial, sans-serif';
-      ctx.fillText('CATEGORY', canvas.width / 2, canvas.height / 2 + 60);
+      const subtitleOffset = canvas.height * 0.084; // Proportional offset (~60px for 716px height)
+      ctx.fillText('CATEGORY', canvas.width / 2, canvas.height / 2 + subtitleOffset);
       
       const texture = new THREE.CanvasTexture(canvas);
       return texture;
@@ -893,7 +898,9 @@
             card.rotation.x = Math.cos(timer * 0.3 + i) * 0.05;
           } else if (userData.state === 'floating-up') {
             // Add some rotation during float up
-            card.rotation.x = (1 - userData.currentY / CATEGORY_HIDDEN_Y_POSITION) * Math.PI * 0.2;
+            // Progress from 0 (at hidden position) to 1 (at target position)
+            const floatProgress = (userData.currentY - CATEGORY_HIDDEN_Y_POSITION) / Math.abs(CATEGORY_HIDDEN_Y_POSITION);
+            card.rotation.x = (1 - floatProgress) * Math.PI * 0.2;
           }
         }
       });
