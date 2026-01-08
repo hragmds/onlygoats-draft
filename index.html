@@ -652,8 +652,11 @@
       }
       
       // Smoothly interpolate camera position based on mouse
-      targetCameraX += (mouseX * MOUSE_INFLUENCE - targetCameraX) * 0.05;
-      targetCameraY += (mouseY * MOUSE_INFLUENCE - targetCameraY) * 0.05;
+      const targetMouseX = mouseX * MOUSE_INFLUENCE;
+      const targetMouseY = mouseY * MOUSE_INFLUENCE;
+      
+      targetCameraX += (targetMouseX - targetCameraX) * 0.1;
+      targetCameraY += (targetMouseY - targetCameraY) * 0.1;
       
       camera.position.x = targetCameraX;
       camera.position.y = -scrollProgress * 3 + targetCameraY;
