@@ -550,6 +550,8 @@
     const CATEGORY_RADIUS_INCREMENT_X = 0.5;
     const CATEGORY_RADIUS_INCREMENT_Y = 0.4;
     const CATEGORY_LAYER_COUNT = 6;
+    const CATEGORY_ENTER_THRESHOLD_RATIO = 0.3; // Viewport height ratio for card appearance
+    const CATEGORY_LEAVE_THRESHOLD_RATIO = 0.5; // Viewport height ratio for float-away trigger
     
     // Category animation thresholds
     let categorySectionTop = 0;
@@ -838,9 +840,9 @@
       // Animate category cards with scroll-based states
       const windowHeight = window.innerHeight;
       const scrollBottom = scrollY + windowHeight;
-      const categoryEnterThreshold = categorySectionTop + windowHeight * 0.3;
+      const categoryEnterThreshold = categorySectionTop + windowHeight * CATEGORY_ENTER_THRESHOLD_RATIO;
       const categoryFixedStart = categorySectionTop;
-      const categoryFixedEnd = categorySectionBottom - windowHeight * 0.5;
+      const categoryFixedEnd = categorySectionBottom - windowHeight * CATEGORY_LEAVE_THRESHOLD_RATIO;
       const categoryLeaveThreshold = categorySectionBottom;
       
       categoryCards.forEach((card, i) => {
@@ -881,7 +883,7 @@
         } else {
           // Floating up state - transitioning from hidden to fixed
           userData.state = 'floating-up';
-          const progress = Math.min((scrollBottom - categoryEnterThreshold) / (windowHeight * 0.3), 1);
+          const progress = Math.min((scrollBottom - categoryEnterThreshold) / (windowHeight * CATEGORY_ENTER_THRESHOLD_RATIO), 1);
           userData.targetY = CATEGORY_HIDDEN_Y_POSITION + progress * Math.abs(CATEGORY_HIDDEN_Y_POSITION); // Animate from hidden position to 0
         }
         
