@@ -406,6 +406,51 @@
       position: relative;
       z-index: 5;
     }
+
+    .categories-section {
+      position: relative;
+      z-index: 5;
+      padding: 80px 48px;
+      max-width: 1400px;
+      margin: 0 auto;
+      text-align: center;
+      min-height: 100vh;
+    }
+
+    .categories-title {
+      font-size: 48px;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.2;
+      margin-bottom: 60px;
+    }
+
+    .categories-description {
+      font-size: 18px;
+      color: #cccccc;
+      line-height: 1.8;
+      margin-bottom: 80px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    @media (max-width: 768px) {
+      .categories-section {
+        padding: 40px 24px;
+        min-height: 80vh;
+      }
+
+      .categories-title {
+        font-size: 32px;
+        margin-bottom: 30px;
+      }
+
+      .categories-description {
+        font-size: 16px;
+        margin-bottom: 40px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -468,11 +513,17 @@
     </div>
   </section>
 
+  <section class="categories-section" id="categories-section">
+    <h2 class="categories-title">Explore Our Categories</h2>
+    <p class="categories-description">Discover legendary cards across all major sports. Each category features the greatest athletes who have defined their sport.</p>
+  </section>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   
   <script>
     let container, camera, scene, renderer;
     const cards = [];
+    const categoryCards = [];
     let scrollY = 0;
     let targetScrollY = 0;
     
@@ -487,8 +538,43 @@
     const MOUSE_SMOOTHING = 0.08; // Single smoothing factor
     const MAX_MOUSE_OFFSET = 1.5; // Clamp camera movement to reasonable bounds
     
+    // Category animation thresholds
+    let categorySectionTop = 0;
+    let categorySectionBottom = 0;
+    
     init();
     animate();
+    
+    // Helper function to create canvas texture with text
+    function createTextTexture(text, bgColor) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 716; // Maintain card aspect ratio
+      const ctx = canvas.getContext('2d');
+      
+      // Background
+      ctx.fillStyle = bgColor;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Border
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 8;
+      ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+      
+      // Text
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 48px Inter, Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text.toUpperCase(), canvas.width / 2, canvas.height / 2);
+      
+      // Subtitle
+      ctx.font = '24px Inter, Arial, sans-serif';
+      ctx.fillText('CATEGORY', canvas.width / 2, canvas.height / 2 + 60);
+      
+      const texture = new THREE.CanvasTexture(canvas);
+      return texture;
+    }
     
     function init() {
       container = document.getElementById('container');
@@ -526,6 +612,7 @@
       const textureLoader = new THREE.TextureLoader();
       const backTexture = textureLoader.load('assets/back.png');
       
+      // Create regular cards
       for (let i = 0; i < 30; i++) {
         const imagePath = cardImages[i % cardImages.length];
         const frontTexture = textureLoader.load(imagePath);
@@ -601,6 +688,69 @@
         cards.push(card);
       }
       
+      // Create category cards
+      const categories = [
+        { name: 'Baseball', color: '#e74c3c' },
+        { name: 'Basketball', color: '#e67e22' },
+        { name: 'Hockey', color: '#3498db' },
+        { name: 'Golf', color: '#27ae60' },
+        { name: 'Football', color: '#9b59b6' }
+      ];
+      
+      const categoryGeometry = new THREE.BoxGeometry(1.5, 2.1, 0.02);
+      const spacing = 2.5; // Space between cards
+      const startX = -(categories.length - 1) * spacing / 2;
+      
+      categories.forEach((category, i) => {
+        const frontTexture = createTextTexture(category.name, category.color);
+        
+        const materials = [
+          new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.3, roughness: 0.4 }),
+          new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.3, roughness: 0.4 }),
+          new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.3, roughness: 0.4 }),
+          new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.3, roughness: 0.4 }),
+          new THREE.MeshStandardMaterial({
+            map: frontTexture,
+            metalness: 0.3,
+            roughness: 0.4
+          }),
+          new THREE.MeshStandardMaterial({
+            map: backTexture,
+            metalness: 0.3,
+            roughness: 0.4
+          })
+        ];
+        
+        const categoryCard = new THREE.Mesh(categoryGeometry, materials);
+        
+        // Start position below the viewport
+        categoryCard.position.x = startX + i * spacing;
+        categoryCard.position.y = -50; // Start far below
+        categoryCard.position.z = 0;
+        
+        categoryCard.rotation.x = 0;
+        categoryCard.rotation.y = 0;
+        categoryCard.rotation.z = 0;
+        
+        categoryCard.userData = {
+          isCategory: true,
+          initialX: startX + i * spacing,
+          index: i,
+          targetY: 0,
+          currentY: -50,
+          state: 'hidden', // hidden, floating-up, fixed, floating-away
+          speedX: (Math.random() * 0.015 + 0.005) * ANIMATION_SPEED,
+          speedY: (Math.random() * 0.015 + 0.005) * ANIMATION_SPEED,
+          rotationSpeed: (Math.random() * 0.005 + 0.002) * ANIMATION_SPEED
+        };
+        
+        scene.add(categoryCard);
+        categoryCards.push(categoryCard);
+      });
+      
+      // Calculate category section position
+      updateCategorySectionBounds();
+      
       renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setPixelRatio(window.devicePixelRatio);
       renderer.setSize(window.innerWidth, window.innerHeight);
@@ -609,6 +759,15 @@
       window.addEventListener('resize', onWindowResize);
       window.addEventListener('scroll', onScroll);
       window.addEventListener('mousemove', onMouseMove);
+    }
+    
+    function updateCategorySectionBounds() {
+      const categorySection = document.getElementById('categories-section');
+      if (categorySection) {
+        const rect = categorySection.getBoundingClientRect();
+        categorySectionTop = rect.top + window.scrollY;
+        categorySectionBottom = categorySectionTop + rect.height;
+      }
     }
     
     function onMouseMove(event) {
@@ -622,6 +781,7 @@
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
+      updateCategorySectionBounds();
     }
     
     function onScroll() {
@@ -641,6 +801,7 @@
       scrollY += (targetScrollY - scrollY) * 0.05;
       const scrollProgress = scrollY * 0.0005;
       
+      // Animate regular cards
       for (let i = 0; i < cards.length; i++) {
         const card = cards[i];
         const userData = card.userData;
@@ -658,6 +819,74 @@
         card.rotation.y += userData.rotationSpeed * 0.7 * (1 + scrollProgress * 0.3);
         card.rotation.z = Math.sin(timer + i) * 0.2 + scrollProgress * 0.1;
       }
+      
+      // Animate category cards with scroll-based states
+      const windowHeight = window.innerHeight;
+      const scrollBottom = scrollY + windowHeight;
+      const categoryEnterThreshold = categorySectionTop + windowHeight * 0.3;
+      const categoryFixedStart = categorySectionTop;
+      const categoryFixedEnd = categorySectionBottom - windowHeight * 0.5;
+      const categoryLeaveThreshold = categorySectionBottom;
+      
+      categoryCards.forEach((card, i) => {
+        const userData = card.userData;
+        
+        // Determine state based on scroll position
+        if (scrollBottom < categoryEnterThreshold) {
+          // Hidden state
+          userData.state = 'hidden';
+          userData.targetY = -50;
+        } else if (scrollY >= categoryFixedStart && scrollY < categoryFixedEnd) {
+          // Fixed state - cards are in view and stationary
+          if (userData.state === 'hidden' || userData.state === 'floating-up') {
+            userData.state = 'fixed';
+          }
+          userData.targetY = 0;
+        } else if (scrollY >= categoryFixedEnd) {
+          // Floating away state - join the main animation
+          userData.state = 'floating-away';
+          
+          // Calculate position to join main card animation
+          const awayProgress = (scrollY - categoryFixedEnd) * 0.002;
+          const baseRadiusX = 5 + (i % 6) * 0.5;
+          const baseRadiusY = 4 + (i % 6) * 0.4;
+          const radiusX = baseRadiusX + scrollProgress * 2 + awayProgress * 3;
+          const radiusY = baseRadiusY + scrollProgress * 1.5 + awayProgress * 2;
+          
+          card.position.x = radiusX * Math.cos(timer * userData.speedX + i * 2);
+          card.position.y = radiusY * Math.sin(timer * userData.speedY + i * 2.2) + awayProgress * 10;
+          card.position.z = (i % 6) * 2 - 6;
+          
+          // Rotate as it floats away
+          card.rotation.x += userData.rotationSpeed * (1 + awayProgress);
+          card.rotation.y += userData.rotationSpeed * 0.7 * (1 + awayProgress);
+          card.rotation.z += userData.rotationSpeed * 0.5;
+          
+          return; // Skip the fixed animation below
+        } else {
+          // Floating up state - transitioning from hidden to fixed
+          userData.state = 'floating-up';
+          const progress = Math.min((scrollBottom - categoryEnterThreshold) / (windowHeight * 0.3), 1);
+          userData.targetY = -50 + progress * 50; // Animate from -50 to 0
+        }
+        
+        // Smooth transition for non-floating-away states
+        if (userData.state !== 'floating-away') {
+          userData.currentY += (userData.targetY - userData.currentY) * 0.1;
+          card.position.y = userData.currentY;
+          card.position.x = userData.initialX;
+          card.position.z = 0;
+          
+          // Gentle rotation when fixed
+          if (userData.state === 'fixed') {
+            card.rotation.y = Math.sin(timer * 0.5 + i) * 0.1;
+            card.rotation.x = Math.cos(timer * 0.3 + i) * 0.05;
+          } else if (userData.state === 'floating-up') {
+            // Add some rotation during float up
+            card.rotation.x = (1 - userData.currentY / -50) * Math.PI * 0.2;
+          }
+        }
+      });
       
       // Single smooth interpolation with clamping
       const targetMouseX = clamp(mouseX * MOUSE_INFLUENCE, -MAX_MOUSE_OFFSET, MAX_MOUSE_OFFSET);
