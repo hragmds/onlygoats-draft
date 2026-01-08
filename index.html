@@ -538,6 +538,16 @@
     const MOUSE_SMOOTHING = 0.08; // Single smoothing factor
     const MAX_MOUSE_OFFSET = 1.5; // Clamp camera movement to reasonable bounds
     
+    // Category animation constants
+    const CATEGORY_HIDDEN_Y_POSITION = -50; // Starting position below viewport
+    const CATEGORY_ANIMATION_SMOOTHING = 0.1; // Smoothing for category card transitions
+    const CATEGORY_AWAY_PROGRESS_FACTOR = 0.002; // Controls float-away speed
+    const CATEGORY_BASE_RADIUS_X = 5;
+    const CATEGORY_BASE_RADIUS_Y = 4;
+    const CATEGORY_RADIUS_INCREMENT_X = 0.5;
+    const CATEGORY_RADIUS_INCREMENT_Y = 0.4;
+    const CATEGORY_LAYER_COUNT = 6;
+    
     // Category animation thresholds
     let categorySectionTop = 0;
     let categorySectionBottom = 0;
@@ -725,7 +735,7 @@
         
         // Start position below the viewport
         categoryCard.position.x = startX + i * spacing;
-        categoryCard.position.y = -50; // Start far below
+        categoryCard.position.y = CATEGORY_HIDDEN_Y_POSITION; // Start far below
         categoryCard.position.z = 0;
         
         categoryCard.rotation.x = 0;
@@ -737,7 +747,7 @@
           initialX: startX + i * spacing,
           index: i,
           targetY: 0,
-          currentY: -50,
+          currentY: CATEGORY_HIDDEN_Y_POSITION,
           state: 'hidden', // hidden, floating-up, fixed, floating-away
           speedX: (Math.random() * 0.015 + 0.005) * ANIMATION_SPEED,
           speedY: (Math.random() * 0.015 + 0.005) * ANIMATION_SPEED,
@@ -835,7 +845,7 @@
         if (scrollBottom < categoryEnterThreshold) {
           // Hidden state
           userData.state = 'hidden';
-          userData.targetY = -50;
+          userData.targetY = CATEGORY_HIDDEN_Y_POSITION;
         } else if (scrollY >= categoryFixedStart && scrollY < categoryFixedEnd) {
           // Fixed state - cards are in view and stationary
           if (userData.state === 'hidden' || userData.state === 'floating-up') {
@@ -847,15 +857,15 @@
           userData.state = 'floating-away';
           
           // Calculate position to join main card animation
-          const awayProgress = (scrollY - categoryFixedEnd) * 0.002;
-          const baseRadiusX = 5 + (i % 6) * 0.5;
-          const baseRadiusY = 4 + (i % 6) * 0.4;
+          const awayProgress = (scrollY - categoryFixedEnd) * CATEGORY_AWAY_PROGRESS_FACTOR;
+          const baseRadiusX = CATEGORY_BASE_RADIUS_X + (i % CATEGORY_LAYER_COUNT) * CATEGORY_RADIUS_INCREMENT_X;
+          const baseRadiusY = CATEGORY_BASE_RADIUS_Y + (i % CATEGORY_LAYER_COUNT) * CATEGORY_RADIUS_INCREMENT_Y;
           const radiusX = baseRadiusX + scrollProgress * 2 + awayProgress * 3;
           const radiusY = baseRadiusY + scrollProgress * 1.5 + awayProgress * 2;
           
           card.position.x = radiusX * Math.cos(timer * userData.speedX + i * 2);
           card.position.y = radiusY * Math.sin(timer * userData.speedY + i * 2.2) + awayProgress * 10;
-          card.position.z = (i % 6) * 2 - 6;
+          card.position.z = (i % CATEGORY_LAYER_COUNT) * 2 - 6;
           
           // Rotate as it floats away
           card.rotation.x += userData.rotationSpeed * (1 + awayProgress);
@@ -867,12 +877,12 @@
           // Floating up state - transitioning from hidden to fixed
           userData.state = 'floating-up';
           const progress = Math.min((scrollBottom - categoryEnterThreshold) / (windowHeight * 0.3), 1);
-          userData.targetY = -50 + progress * 50; // Animate from -50 to 0
+          userData.targetY = CATEGORY_HIDDEN_Y_POSITION + progress * Math.abs(CATEGORY_HIDDEN_Y_POSITION); // Animate from hidden position to 0
         }
         
         // Smooth transition for non-floating-away states
         if (userData.state !== 'floating-away') {
-          userData.currentY += (userData.targetY - userData.currentY) * 0.1;
+          userData.currentY += (userData.targetY - userData.currentY) * CATEGORY_ANIMATION_SMOOTHING;
           card.position.y = userData.currentY;
           card.position.x = userData.initialX;
           card.position.z = 0;
@@ -883,7 +893,7 @@
             card.rotation.x = Math.cos(timer * 0.3 + i) * 0.05;
           } else if (userData.state === 'floating-up') {
             // Add some rotation during float up
-            card.rotation.x = (1 - userData.currentY / -50) * Math.PI * 0.2;
+            card.rotation.x = (1 - userData.currentY / CATEGORY_HIDDEN_Y_POSITION) * Math.PI * 0.2;
           }
         }
       });
