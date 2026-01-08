@@ -476,14 +476,16 @@
     let scrollY = 0;
     let targetScrollY = 0;
     
-    // Mouse parallax variables
+    // Mouse parallax variables with better scoping
     let mouseX = 0;
     let mouseY = 0;
     let targetCameraX = 0;
     let targetCameraY = 0;
     
     const ANIMATION_SPEED = 0.5;
-    const MOUSE_INFLUENCE = 0.02; // How much the mouse affects camera position
+    const MOUSE_INFLUENCE = 0.15; // Increased from 0.02 for noticeable effect
+    const MOUSE_SMOOTHING = 0.08; // Single smoothing factor
+    const MAX_MOUSE_OFFSET = 1.5; // Clamp camera movement to reasonable bounds
     
     init();
     animate();
@@ -611,8 +613,9 @@
     
     function onMouseMove(event) {
       // Normalize mouse position to -1 to 1 range
+      // Removed Y-axis inversion for more natural feel
       mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-      mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+      mouseY = (event.clientY / window.innerHeight) * 2 - 1;
     }
     
     function onWindowResize() {
@@ -623,6 +626,11 @@
     
     function onScroll() {
       targetScrollY = window.scrollY;
+    }
+    
+    // Clamp function to limit values
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
     }
     
     function animate() {
@@ -651,17 +659,21 @@
         card.rotation.z = Math.sin(timer + i) * 0.2 + scrollProgress * 0.1;
       }
       
-      // Smoothly interpolate camera position based on mouse
-      const targetMouseX = mouseX * MOUSE_INFLUENCE;
-      const targetMouseY = mouseY * MOUSE_INFLUENCE;
+      // Single smooth interpolation with clamping
+      const targetMouseX = clamp(mouseX * MOUSE_INFLUENCE, -MAX_MOUSE_OFFSET, MAX_MOUSE_OFFSET);
+      const targetMouseY = clamp(mouseY * MOUSE_INFLUENCE, -MAX_MOUSE_OFFSET, MAX_MOUSE_OFFSET);
       
-      targetCameraX += (targetMouseX - targetCameraX) * 0.1;
-      targetCameraY += (targetMouseY - targetCameraY) * 0.1;
+      targetCameraX += (targetMouseX - targetCameraX) * MOUSE_SMOOTHING;
+      targetCameraY += (targetMouseY - targetCameraY) * MOUSE_SMOOTHING;
       
+      // Apply mouse parallax to camera position
+      const scrollCameraY = -scrollProgress * 3;
       camera.position.x = targetCameraX;
-      camera.position.y = -scrollProgress * 3 + targetCameraY;
+      camera.position.y = scrollCameraY + targetCameraY;
       camera.position.z = 8 - scrollProgress * 2;
-      camera.lookAt(0, -scrollProgress * 3, 0);
+      
+      // Update lookAt to include mouse offset for more cohesive feel
+      camera.lookAt(targetCameraX * 0.5, scrollCameraY + targetCameraY * 0.5, 0);
       
       renderer.render(scene, camera);
     }
