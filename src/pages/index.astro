@@ -1,0 +1,569 @@
+---
+
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OnlyGoatz</title>
+  <style data-shopify>
+    @font-face {
+      font-family: Inter;
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+      src: url("//onlygoatz.com/cdn/fonts/inter/inter_n7.02711e6b374660cfc7915d1afc1c204e633421e4.woff2") format("woff2"),
+           url("//onlygoatz.com/cdn/fonts/inter/inter_n7.6dab87426f6b8813070abd79972ceaf2f8d3b012.woff") format("woff");
+    }
+    @font-face {
+      font-family: Inter;
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
+      src: url("//onlygoatz.com/cdn/fonts/inter/inter_n5.d7101d5e168594dd06f56f290dd759fba5431d97.woff2") format("woff2"),
+           url("//onlygoatz.com/cdn/fonts/inter/inter_n5.5332a76bbd27da00474c136abb1ca3cbbf259068.woff") format("woff");
+    }
+  </style>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Inter, sans-serif;
+      margin: 0;
+      overflow-y: scroll;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 32px;
+      background-color: #ffffff;
+      border-bottom: 1px solid #e5e5e5;
+      position: relative;
+      z-index: 10;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+    }
+
+    .logo {
+      height: 40px;
+    }
+
+    nav {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: #171717;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    nav a:hover {
+      color: #666666;
+    }
+
+    .search-icon {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    .hero {
+      position: relative;
+      width: 100%;
+      height: 600px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 0 0 0;
+	  gap: 48px;
+      overflow: hidden;
+      z-index: 5;
+    }
+
+    .hero-content-left {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .hero-text {
+      font-size: 48px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.2;
+	  text-align: center;
+    }
+
+    .hero-button {
+      padding: 14px 32px;
+      background-color: #fff;
+      color: #000;
+      border: none;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .hero-button:hover {
+      background-color: #333333;
+    }
+
+    #container {
+      width: 100%;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #0a0a0a;
+      z-index: -1;
+    }
+
+    .collage {
+      position: relative;
+      z-index: 5;
+      padding: 80px 48px;
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .title-wrapper {
+      flex: 0 0 40%;
+      min-width: 300px;
+    }
+
+    .heading {
+      font-size: 48px;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.2;
+      margin: 0;
+      position: relative;
+    }
+
+    .highlighted-text {
+      position: relative;
+      font-style: normal;
+      display: inline-block;
+    }
+
+    .icon-basic-underline {
+      width: 150px;
+      height: 40px;
+      position: absolute;
+      bottom: -10px;
+      left: 0;
+      stroke: #ffffff;
+    }
+
+    .rich-text {
+      flex: 1;
+      min-width: 300px;
+	  max-width: 60%;
+	  text-align: center;
+    }
+
+    .rte {
+      font-size: 16px;
+      line-height: 1.8;
+      color: #cccccc;
+    }
+
+    .rte p {
+      margin: 0;
+    }
+
+    .rte strong {
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .rte em {
+      font-style: italic;
+      color: #ffffff;
+    }
+
+    @media (max-width: 768px) {
+      header {
+        padding: 12px 16px;
+      }
+
+      .header-left {
+        gap: 20px;
+        width: 100%;
+      }
+
+      .logo {
+        height: 32px;
+      }
+
+      nav {
+        display: none;
+      }
+
+      .hero {
+        height: 400px;
+        padding: 24px;
+        flex-direction: column;
+        justify-content: flex-end;
+        gap: 20px;
+      }
+
+      .hero-text {
+        font-size: 32px;
+      }
+
+      .collage {
+        flex-direction: column;
+        gap: 40px;
+        padding: 40px 24px;
+      }
+
+      .title-wrapper {
+        flex: 1;
+        min-width: unset;
+      }
+
+      .heading {
+        font-size: 32px;
+      }
+
+      .icon-basic-underline {
+        width: 120px;
+        height: 35px;
+        bottom: -8px;
+      }
+
+      .rich-text {
+        min-width: unset;
+      }
+
+      .rte {
+        font-size: 16px;
+      }
+
+      .reviews-section {
+        padding: 40px 24px;
+      }
+
+      .quote-mark {
+        font-size: 100px;
+        margin-bottom: 15px;
+      }
+
+      .review-text {
+        font-size: 18px;
+        min-height: 70px;
+      }
+
+      .carousel-dots {
+        margin-bottom: 15px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      header {
+        padding: 12px 12px;
+      }
+
+      .header-left {
+        gap: 12px;
+      }
+
+      nav {
+        display: none;
+      }
+
+      nav a {
+        padding: 4px 6px;
+      }
+
+      .hero {
+        height: 300px;
+        padding: 16px;
+      }
+
+      .hero-text {
+        font-size: 28px;
+      }
+
+      .hero-button {
+        padding: 12px 24px;
+        font-size: 14px;
+      }
+
+      .collage {
+        padding: 30px 16px;
+        gap: 30px;
+      }
+
+      .heading {
+        font-size: 26px;
+      }
+
+      .icon-basic-underline {
+        width: 90px;
+        height: 28px;
+      }
+
+      .reviews-section {
+        padding: 30px 16px;
+      }
+
+      .quote-mark {
+        font-size: 80px;
+      }
+
+      .review-text {
+        font-size: 16px;
+        min-height: 60px;
+      }
+
+      .dot {
+        width: 8px;
+        height: 8px;
+      }
+    }
+
+    .reviews-section {
+      position: relative;
+      z-index: 5;
+      padding: 80px 48px;
+      max-width: 1000px;
+      margin: 48px auto 128px auto;
+      text-align: center;
+    }
+
+    .reviews-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .quote-mark {
+      font-size: 120px;
+      color: rgba(255, 255, 255);
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 20px;
+    }
+
+    .review-text {
+      font-size: 20px;
+      font-weight: 500;
+      color: #ffffff;
+      line-height: 1.6;
+      margin-bottom: 40px;
+      min-height: 80px;
+      max-width: 700px;
+      opacity: 1;
+      transition: opacity 0.5s ease-in-out;
+    }
+
+    .review-text.fade-out {
+      opacity: 0;
+    }
+
+    .carousel-dots {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      transition: background-color 0.5s ease-in-out, opacity 0.5s ease-in-out;
+      opacity: 1;
+    }
+
+    .dot.fade-out {
+      opacity: 0.1;
+    }
+
+    .dot.active {
+      background-color: #ffffff;
+    }
+
+    .scrollable-area {
+      height:500vh;
+      position: relative;
+      z-index: 5;
+    }
+
+    .categories-section {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      max-width: 1400px;
+      margin: 0 auto;
+      text-align: center;
+      min-height: 200vh; /* Taller to allow scroll through animation */
+      padding-bottom: 100vh; /* Extra space for scrolling */
+    }
+
+    .categories-title {
+      font-size: 48px;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.2;
+      margin-bottom: 40px;
+    }
+
+    .categories-description {
+      font-size: 18px;
+      color: #cccccc;
+      line-height: 1.8;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .categories-cards-container {
+      width: 100%;
+      height: 60vh; /* Height relative to viewport - cards will scale proportionally */
+      min-height: 400px; /* Minimum height for smaller screens */
+      max-height: 600px; /* Maximum height to prevent oversizing */
+      pointer-events: none;
+    }
+
+    .categories-cards-container canvas {
+      pointer-events: auto;
+    }
+
+    @media (max-width: 768px) {
+      .categories-section {
+        padding: 40px 24px;
+        min-height: 80vh;
+      }
+
+      .categories-title {
+        font-size: 32px;
+        margin-bottom: 30px;
+      }
+
+      .categories-description {
+        font-size: 16px;
+        margin-bottom: 40px;
+      }
+
+      .categories-cards-container {
+        height: 350px;
+        margin-top: 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="container"></div>
+
+  <header>
+    <div class="header-left">
+      <img src="assets/logo.png" alt="OnlyGoatz Logo" class="logo">
+      <nav>
+        <a href="#home">Home</a>
+        <a href="#shop">Shop</a>
+        <a href="#sell">Sell Your Cards</a>
+        <a href="#events">Events</a>
+        <a href="#help">Help Center</a>
+        <a href="#news">News</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+    <div class="search">
+      <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+      </svg>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-content-left">
+      <div class="hero-text">
+        <div>Unbox the legends</div>
+        <div>Discover your GOAT</div>
+      </div>
+    </div>
+    <button class="hero-button">Shop Now</button>
+  </section>
+
+  <div class="collage">
+    <div class="title-wrapper">
+      <h2 class="heading">
+        Why <span class="highlighted-text">ONLYGOATZ<svg class="icon-basic-underline" viewBox="-400 -55 730 60" stroke="currentColor" fill="none" role="presentation" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-width="30" pathLength="1" stroke="#F8D247" d="m -383.25 32 c 55.25 -22 130.75 -33.5 293.25 -38 c 54.5 -0.5 195 -2.5 401 15"></path>
+        </svg></span>?
+      </h2>
+    </div>
+    <div class="rich-text">
+      <div class="rte">
+        <p>Welcome to <strong>ONLYGOATZ.COM</strong>, "<em>Where Sports Icons Live Forever.</em>" With over 30 years of experience in the sports card industry, we specialize in bringing you the most sought-after collectibles featuring the greatest athletes of all time. Our commitment to quality ensures that every card you purchase is a piece of history, meticulously curated for true sports enthusiasts.</p>
+      </div>
+    </div>
+  </div>
+
+  <section class="reviews-section">
+    <div class="reviews-container">
+      <img src="/quotes.svg" alt="quote" class="quote-mark" style="filter: brightness(0) invert(1); width: 60px; height: 60px;">
+      <div class="review-text" id="review-text">Adam is amazing to work with. Honest and a man of his word. And The Hair!!</div>
+      <div class="carousel-dots">
+        <span class="dot active" onclick="showReview(0)"></span>
+        <span class="dot" onclick="showReview(1)"></span>
+        <span class="dot" onclick="showReview(2)"></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="categories-section" id="categories-section">
+    <h2 class="categories-title">Explore Our Categories</h2>
+    <p class="categories-description">Discover legendary cards across all major sports. Each category features the greatest athletes who have defined their sport.</p>
+    <div class="categories-cards-container" id="category-cards-container"></div>
+    <noscript>
+      <p style="color: #cccccc; margin-top: 40px;">JavaScript is required to view the interactive 3D category cards. Please enable JavaScript in your browser.</p>
+    </noscript>
+  </section>
+
+
+  
+ <script src="../scripts/three-setup.js"></script>
+
+  <div class="scrollable-area"></div>
+</body>
+</html>

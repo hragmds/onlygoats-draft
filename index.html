@@ -404,7 +404,7 @@
     .scrollable-area {
       height: 300vh;
       position: relative;
-      z-index: 5;
+      z-index: -5;
     }
 
     .categories-section {
@@ -522,6 +522,7 @@
   </section>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/geometries/RoundedBoxGeometry.js"></script>
   
   <script>
     let container, camera, scene, renderer;
@@ -537,7 +538,7 @@
     let targetCameraY = 0;
     
     const ANIMATION_SPEED = 0.5;
-    const MOUSE_INFLUENCE = 0.15; // Increased from 0.02 for noticeable effect
+    const MOUSE_INFLUENCE = 0.1; // Increased from 0.02 for noticeable effect
     const MOUSE_SMOOTHING = 0.08; // Single smoothing factor
     const MAX_MOUSE_OFFSET = 1.5; // Clamp camera movement to reasonable bounds
     
@@ -560,7 +561,7 @@
     const CATEGORY_ORBITAL_SPEED_X = 2; // Orbital motion X speed factor
     const CATEGORY_ORBITAL_SPEED_Y = 2.2; // Orbital motion Y speed factor
     const CATEGORY_AWAY_Y_OFFSET = 10; // Vertical offset during float-away
-    const CATEGORY_Z_SPACING = 2; // Z-axis spacing per layer
+    const CATEGORY_Z_SPACING = 10; // Z-axis spacing per layer
     const CATEGORY_Z_OFFSET = -6; // Base Z-axis offset
     
     // Category animation thresholds
@@ -591,7 +592,7 @@
       directionalLight.position.set(5, 5, 5);
       scene.add(directionalLight);
       
-      const cardGeometry = new THREE.BoxGeometry(1.5, 2.1, 0.02);
+      const cardGeometry = new THREE.RoundedBoxGeometry(1.5, 2.1, 0.05, 4, 0.06);
       
       const cardImages = [
         'assets/Gretzky OPC front.jpg',
@@ -606,25 +607,35 @@
       const textureLoader = new THREE.TextureLoader();
       const backTexture = textureLoader.load('assets/back.png');
       
+      // Create shared plastic slab edge material (reused for all cards)
+      const slabPlasticMaterial = new THREE.MeshStandardMaterial({
+        color: 0xf0f0f0,          // Light gray/white plastic
+        metalness: 0.6,           // Plastic sheen
+        roughness: 0.2,           // Glossy finish
+        transparent: true,
+        opacity: 0.92,            // Slightly see-through
+        side: THREE.DoubleSide
+      });
+      
       // Create regular cards
       for (let i = 0; i < 30; i++) {
         const imagePath = cardImages[i % cardImages.length];
         const frontTexture = textureLoader.load(imagePath);
         
         const materials = [
-          new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.3, roughness: 0.4 }),
-          new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.3, roughness: 0.4 }),
-          new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.3, roughness: 0.4 }),
-          new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.3, roughness: 0.4 }),
+          slabPlasticMaterial,    // Right edge - plastic
+          slabPlasticMaterial,    // Left edge - plastic
+          slabPlasticMaterial,    // Top edge - plastic
+          slabPlasticMaterial,    // Bottom edge - plastic
           new THREE.MeshStandardMaterial({
             map: frontTexture,
-            metalness: 0.3,
-            roughness: 0.4
+            metalness: 0.2,       // Card surface (less reflective than plastic)
+            roughness: 0.5
           }),
           new THREE.MeshStandardMaterial({
             map: backTexture,
-            metalness: 0.3,
-            roughness: 0.4
+            metalness: 0.2,
+            roughness: 0.5
           })
         ];
         
@@ -633,7 +644,7 @@
         const numLayers = 6;
         const layerDepth = 12 / numLayers;
         const layer = i % numLayers;
-        const zPosition = layer * layerDepth - 6;
+        const zPosition = layer * layerDepth - 12;
         
         let validPosition = false;
         let attempts = 0;
@@ -684,15 +695,15 @@
       
       // Create category cards
       const categories = [
-        { name: 'Baseball', image: 'assets/Baseball-Category.jpg' },
-        { name: 'Basketball', image: 'assets/Basketball-Category.jpg' },
-        { name: 'Hockey', image: 'assets/Hockey-Category.jpg' },
-        { name: 'Golf', image: 'assets/Golf-Category.jpg' },
-        { name: 'Football', image: 'assets/Football-Category.jpg' }
+        { name: 'Baseball', image: 'assets/Baseball-Category.png' },
+        { name: 'Basketball', image: 'assets/Basketball-Category.png' },
+        { name: 'Hockey', image: 'assets/Hockey-Category.png' },
+        { name: 'Golf', image: 'assets/Golf-Category.png' },
+        { name: 'Football', image: 'assets/Football-Category.png' }
       ];
       
-      const categoryGeometry = new THREE.BoxGeometry(1.5, 2.1, 0.02);
-      const categoryBackTexture = textureLoader.load('assets/Category-back.jpg');
+      const categoryGeometry = new THREE.RoundedBoxGeometry(1.5, 2.1, 0.05, 4, 0.06);
+      const categoryBackTexture = textureLoader.load('assets/Category-back.png');
       const spacing = 2.5; // Space between cards
       const startX = -(categories.length - 1) * spacing / 2;
       
@@ -700,19 +711,19 @@
         const frontTexture = textureLoader.load(category.image);
         
         const materials = [
-          new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.3, roughness: 0.4 }),
-          new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.3, roughness: 0.4 }),
-          new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.3, roughness: 0.4 }),
-          new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.3, roughness: 0.4 }),
+          slabPlasticMaterial,    // Right edge - plastic
+          slabPlasticMaterial,    // Left edge - plastic
+          slabPlasticMaterial,    // Top edge - plastic
+          slabPlasticMaterial,    // Bottom edge - plastic
           new THREE.MeshStandardMaterial({
             map: frontTexture,
-            metalness: 0.3,
-            roughness: 0.4
+            metalness: 0.2,
+            roughness: 0.5
           }),
           new THREE.MeshStandardMaterial({
             map: categoryBackTexture,
-            metalness: 0.3,
-            roughness: 0.4
+            metalness: 0.2,
+            roughness: 0.5
           })
         ];
         
@@ -721,7 +732,7 @@
         // Start position below the viewport
         categoryCard.position.x = startX + i * spacing;
         categoryCard.position.y = CATEGORY_HIDDEN_Y_POSITION; // Start far below
-        categoryCard.position.z = 0;
+        categoryCard.position.z = 2; // In front of all floating cards
         
         categoryCard.rotation.x = 0;
         categoryCard.rotation.y = 0;
@@ -767,8 +778,8 @@
     
     function onMouseMove(event) {
       // Normalize mouse position to -1 to 1 range
-      // Removed Y-axis inversion for more natural feel
-      mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+      // X-axis inverted for opposite camera movement
+      mouseX = -((event.clientX / window.innerWidth) * 2 - 1);
       mouseY = (event.clientY / window.innerHeight) * 2 - 1;
     }
     
@@ -838,26 +849,12 @@
           }
           userData.targetY = 0;
         } else if (scrollY >= categoryFixedEnd) {
-          // Floating away state - join the main animation
+          // Floating away state - move upwards and fade out
           userData.state = 'floating-away';
           
-          // Calculate position to join main card animation
+          // Calculate upward movement
           const awayProgress = (scrollY - categoryFixedEnd) * CATEGORY_AWAY_PROGRESS_FACTOR;
-          const baseRadiusX = CATEGORY_BASE_RADIUS_X + (i % CATEGORY_LAYER_COUNT) * CATEGORY_RADIUS_INCREMENT_X;
-          const baseRadiusY = CATEGORY_BASE_RADIUS_Y + (i % CATEGORY_LAYER_COUNT) * CATEGORY_RADIUS_INCREMENT_Y;
-          const radiusX = baseRadiusX + scrollProgress * CATEGORY_SCROLL_RADIUS_MULTIPLIER + awayProgress * CATEGORY_AWAY_RADIUS_X_MULTIPLIER;
-          const radiusY = baseRadiusY + scrollProgress * (CATEGORY_SCROLL_RADIUS_MULTIPLIER * 0.75) + awayProgress * CATEGORY_AWAY_RADIUS_Y_MULTIPLIER;
-          
-          card.position.x = radiusX * Math.cos(timer * userData.speedX + i * CATEGORY_ORBITAL_SPEED_X);
-          card.position.y = radiusY * Math.sin(timer * userData.speedY + i * CATEGORY_ORBITAL_SPEED_Y) + awayProgress * CATEGORY_AWAY_Y_OFFSET;
-          card.position.z = (i % CATEGORY_LAYER_COUNT) * CATEGORY_Z_SPACING + CATEGORY_Z_OFFSET;
-          
-          // Rotate as it floats away
-          card.rotation.x += userData.rotationSpeed * (1 + awayProgress);
-          card.rotation.y += userData.rotationSpeed * 0.7 * (1 + awayProgress);
-          card.rotation.z += userData.rotationSpeed * 0.5;
-          
-          return; // Skip the fixed animation below
+          userData.targetY = awayProgress * CATEGORY_AWAY_Y_OFFSET;
         } else {
           // Floating up state - transitioning from hidden to fixed
           userData.state = 'floating-up';
@@ -870,7 +867,7 @@
           userData.currentY += (userData.targetY - userData.currentY) * CATEGORY_ANIMATION_SMOOTHING;
           card.position.y = userData.currentY;
           card.position.x = userData.initialX;
-          card.position.z = 0;
+          card.position.z = 2; // Keep in front
           
           // Gentle rotation when fixed
           if (userData.state === 'fixed') {
@@ -881,6 +878,11 @@
             // Progress from 0 (at hidden position) to 1 (at target position)
             const floatProgress = (userData.currentY - CATEGORY_HIDDEN_Y_POSITION) / Math.abs(CATEGORY_HIDDEN_Y_POSITION);
             card.rotation.x = (1 - floatProgress) * Math.PI * 0.2;
+          } else if (userData.state === 'floating-away') {
+            // Keep cards upright when floating away - no rotation
+            card.rotation.x = 0;
+            card.rotation.y = 0;
+            card.rotation.z = 0;
           }
         }
       });
