@@ -89,19 +89,26 @@ export class CategoryCards {
 
     // Card dimensions and spacing in base units
     const baseCardWidth = 1.5;
-    const baseSpacingRatio = 0.3;
+    const baseSpacingRatio = 0.2;
 
-    // Calculate how many "units" we need for 5 cards:
-    // 5 cards + 4 gaps between them
-    const totalUnitsNeeded = 5 + (4 * baseSpacingRatio);
+    // Calculate total width needed:
+    // - 4 gaps between 5 cards, each gap = cardWidth * spacingRatio
+    // - Plus half a card width on each edge (left and right)
+    // Total = 4 * cardWidth * (1 + spacingRatio) + cardWidth
+    //       = cardWidth * (4 * (1 + spacingRatio) + 1)
+    //       = cardWidth * (4 * 1.3 + 1) = cardWidth * 6.2
+    const totalUnitsNeeded = baseCardWidth * (4 * (1 + baseSpacingRatio) + 1);
 
-    // Calculate scale to fit in visible width (with 10% margin)
-    const CARD_SCALE = Math.min(5, (visibleWidth * 0.9) / (baseCardWidth * totalUnitsNeeded));
+    // Calculate scale to fit in visible width (with 15% margin for breathing room)
+    const CARD_SCALE = Math.min(5, (visibleWidth * 0.85) / totalUnitsNeeded);
 
     const categoryGeometry = new RoundedBoxGeometry(1.5 * CARD_SCALE, 2.1 * CARD_SCALE, 0.05, 4, 0.06);
     const categoryBackTexture = textureLoader.load('assets/back.png');
     const spacing = baseCardWidth * CARD_SCALE * (1 + baseSpacingRatio);
-    const startX = -(categories.length - 1) * spacing / 2;
+    
+    // Calculate start position to center the group symmetrically
+    // Position cards at: -2*spacing, -1*spacing, 0, 1*spacing, 2*spacing for 5 cards
+    const centerOffset = (categories.length - 1) / 2;
 
     categories.forEach((category, i) => {
       const frontTexture = textureLoader.load(category.image);
@@ -126,7 +133,7 @@ export class CategoryCards {
       categoryMesh.userData = {
         index: i,
         categoryName: category.name,
-        targetX: startX + i * spacing, // Final spread position
+        targetX: (i - centerOffset) * spacing, // Position relative to center
         initialX: 0,
         initialRotation: Math.PI,
         targetRotation: 0,
@@ -267,6 +274,7 @@ export class CategoryCards {
     this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
     
+    
     // Don't need to call checkIntersections here since it's called every frame in animate()
   }
   
@@ -284,6 +292,7 @@ export class CategoryCards {
   }
   
   onClick(event) {
+    
     if (!this.interactionsEnabled || !this.renderer || !this.camera) {
       return;
     }
@@ -291,8 +300,6 @@ export class CategoryCards {
     // Use the current hoveredCard since we're checking intersections every frame
     if (this.hoveredCard) {
       const categoryName = this.hoveredCard.userData.categoryName;
-      
-      console.log(`Clicked on ${categoryName} card`);
       
       // Dispatch custom event with category info
       const clickEvent = new CustomEvent('categoryCardClick', {
@@ -310,13 +317,19 @@ export class CategoryCards {
   
   checkIntersections() {
     // Don't check if interactions are disabled or mouse not over canvas
-    if (!this.interactionsEnabled || !this.mouseIsOver) {
+    if (!this.interactionsEnabled) {
+      // Only log once when first disabled
       if (this.hoveredCard !== null) {
+        this.hoveredCard = null;
         this.hoveredCard = null;
         if (this.renderer && this.renderer.domElement) {
           this.renderer.domElement.style.cursor = 'default';
         }
       }
+      return;
+    }
+    
+    if (!this.mouseIsOver) {
       return;
     }
     

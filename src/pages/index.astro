@@ -425,14 +425,13 @@
     .scrollable-area {
       height:500vh;
       position: relative;
-      z-index: 5;
+      z-index: 0;
     }
 
     .categories-section {
       position: sticky;
       top: 0;
       z-index: 5;
-      max-width: 1400px;
       margin: 0 auto;
       text-align: center;
       min-height: 200vh; /* Taller to allow scroll through animation */
@@ -461,11 +460,6 @@
       height: 60vh; /* Height relative to viewport - cards will scale proportionally */
       min-height: 400px; /* Minimum height for smaller screens */
       max-height: 600px; /* Maximum height to prevent oversizing */
-      pointer-events: none;
-    }
-
-    .categories-cards-container canvas {
-      pointer-events: auto;
     }
 
     @media (max-width: 768px) {
