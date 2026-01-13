@@ -10,17 +10,16 @@ export class RegularCards {
     const cardGeometry = new RoundedBoxGeometry(1.5, 2.1, 0.05, 4, 0.06);
 
     const cardImages = [
-      'assets/Gretzky OPC front.jpg',
-      'assets/Henderson Topps front.jpg',
-      'assets/Jordan Fleer front.jpg',
-      'assets/Jordan Star front.jpg',
-      'assets/Kiss Comic Front.jpg',
-      'assets/Tiger Woods Front.jpg',
-      'assets/Trout Bowman Auto front.jpg'
+      '/onlygoats-draft/assets/Gretzky OPC front.jpg',
+      '/onlygoats-draft/assets/Henderson Topps front.jpg',
+      '/onlygoats-draft/assets/Jordan Fleer front.jpg',
+      '/onlygoats-draft/assets/Jordan Star front.jpg',
+      '/onlygoats-draft/assets/Kiss Comic Front.jpg',
+      '/onlygoats-draft/assets/Tiger Woods Front.jpg',
+      '/onlygoats-draft/assets/Trout Bowman Auto front.jpg'
     ];
 
-    const backTexture = textureLoader.load('assets/back.png');
-
+    const backTexture = textureLoader.load('/onlygoats-draft/assets/back.png');
     cardImages.forEach((imgPath, i) => {
       const frontTexture = textureLoader.load(imgPath);
 

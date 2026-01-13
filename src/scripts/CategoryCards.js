@@ -72,11 +72,11 @@ export class CategoryCards {
 
   createCards(textureLoader, slabPlasticMaterial) {
     const categories = [
-      { name: 'Baseball', image: 'assets/Baseball-Category.png' },
-      { name: 'Basketball', image: 'assets/Basketball-Category.png' },
-      { name: 'Hockey', image: 'assets/Hockey-Category.png' },
-      { name: 'Golf', image: 'assets/Golf-Category.png' },
-      { name: 'Football', image: 'assets/Football-Category.png' }
+      { name: 'Baseball', image: '/onlygoats-draft/assets/Baseball-Category.png' },
+      { name: 'Basketball', image: '/onlygoats-draft/assets/Basketball-Category.png' },
+      { name: 'Hockey', image: '/onlygoats-draft/assets/Hockey-Category.png' },
+      { name: 'Golf', image: '/onlygoats-draft/assets/Golf-Category.png' },
+      { name: 'Football', image: '/onlygoats-draft/assets/Football-Category.png' }
     ];
 
     // Calculate card scale based on viewport width
@@ -103,7 +103,7 @@ export class CategoryCards {
     const CARD_SCALE = Math.min(5, (visibleWidth * 0.85) / totalUnitsNeeded);
 
     const categoryGeometry = new RoundedBoxGeometry(1.5 * CARD_SCALE, 2.1 * CARD_SCALE, 0.05, 4, 0.06);
-    const categoryBackTexture = textureLoader.load('assets/back.png');
+    const categoryBackTexture = textureLoader.load('/onlygoats-draft/assets/back.png');
     const spacing = baseCardWidth * CARD_SCALE * (1 + baseSpacingRatio);
     
     // Calculate start position to center the group symmetrically
