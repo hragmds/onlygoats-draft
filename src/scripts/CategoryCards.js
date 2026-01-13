@@ -15,7 +15,7 @@ export class CategoryCards {
     // Animation state
     this.scrollProgress = 0; // 0 to 1 based on scroll through section
     this.ANIMATION_SCROLL_DISTANCE = 3200; // Pixels to scroll for full animation (adjustable)
-    this.STICKY_BUFFER = 500; // Extra scroll after animation before unstick
+    this.STICKY_BUFFER = 0; // Extra scroll after animation before unstick
     this.stickyStartScroll = null; // Track when section became sticky
     
     // Interaction state
