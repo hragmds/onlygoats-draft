@@ -1,5 +1,5 @@
 ---
-
+import HeroCanvas from '../components/HeroCanvas.astro';
 ---
 
 <!DOCTYPE html>
@@ -37,6 +37,7 @@
       font-family: Inter, sans-serif;
       margin: 0;
       overflow-y: scroll;
+      background: #0a0a0a;
     }
 
     header {
@@ -89,13 +90,29 @@
       width: 100%;
       height: 600px;
       display: flex;
-      flex-direction: column;
+      z-index: 5;
+      background: #ffffff;
+      padding: 48px;
+    }
+
+    .hero-canvas-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
       align-items: center;
       justify-content: center;
-      padding: 48px 0 0 0;
-	  gap: 48px;
-      overflow: hidden;
-      z-index: 5;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 48px;
     }
 
     .hero-content-left {
@@ -128,25 +145,7 @@
       background-color: #333333;
     }
 
-    #container {
-      width: 100%;
-      height: 100vh;
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 0;
-    }
 
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #0a0a0a;
-      z-index: -1;
-    }
 
     .collage {
       position: relative;
@@ -486,8 +485,6 @@
   </style>
 </head>
 <body>
-  <div id="container"></div>
-
   <header>
     <div class="header-left">
       <img src="/onlygoats-draft/assets/logo.png" alt="OnlyGoatz Logo" class="logo">
@@ -509,47 +506,16 @@
   </header>
 
   <section class="hero">
-    <div class="hero-content-left">
-      <div class="hero-text">
-        <div>Unbox the legends</div>
-        <div>Discover your GOAT</div>
-      </div>
-    </div>
-    <button class="hero-button">Shop Now</button>
-  </section>
-
-  <div class="collage">
-    <div class="title-wrapper">
-      <h2 class="heading">
-        Why <span class="highlighted-text">ONLYGOATZ<svg class="icon-basic-underline" viewBox="-400 -55 730 60" stroke="currentColor" fill="none" role="presentation" xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-width="30" pathLength="1" stroke="#F8D247" d="m -383.25 32 c 55.25 -22 130.75 -33.5 293.25 -38 c 54.5 -0.5 195 -2.5 401 15"></path>
-        </svg></span>?
-      </h2>
-    </div>
-    <div class="rich-text">
-      <div class="rte">
-        <p>Welcome to <strong>ONLYGOATZ.COM</strong>, "<em>Where Sports Icons Live Forever.</em>" With over 30 years of experience in the sports card industry, we specialize in bringing you the most sought-after collectibles featuring the greatest athletes of all time. Our commitment to quality ensures that every card you purchase is a piece of history, meticulously curated for true sports enthusiasts.</p>
-      </div>
-    </div>
-  </div>
-
-  <section class="categories-section" id="categories-section">
-    <h2 class="categories-title">Explore Our Categories</h2>
-    <p class="categories-description">Discover legendary cards across all major sports. Each category features the greatest athletes who have defined their sport.</p>
-    <div class="categories-cards-container" id="category-cards-container"></div>
-    <noscript>
-      <p style="color: #cccccc; margin-top: 40px;">JavaScript is required to view the interactive 3D category cards. Please enable JavaScript in your browser.</p>
-    </noscript>
-  </section>
-
-  <section class="reviews-section">
-    <div class="reviews-container">
-      <img src="/onlygoats-draft/quotes.svg" alt="quote" class="quote-mark" style="filter: brightness(0) invert(1); width: 60px; height: 60px;">
-      <div class="review-text" id="review-text">Adam is amazing to work with. Honest and a man of his word. And The Hair!!</div>
-      <div class="carousel-dots">
-        <span class="dot active" onclick="showReview(0)"></span>
-        <span class="dot" onclick="showReview(1)"></span>
-        <span class="dot" onclick="showReview(2)"></span>
+    <div class="hero-canvas-wrapper">
+      <HeroCanvas />
+      <div class="hero-content">
+        <div class="hero-content-left">
+          <div class="hero-text">
+            <div>Unbox the legends</div>
+            <div>Discover your GOAT</div>
+          </div>
+        </div>
+        <button class="hero-button">Shop Now</button>
       </div>
     </div>
   </section>

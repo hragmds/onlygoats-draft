@@ -1,0 +1,99 @@
+---
+---
+
+<div id="hero-canvas-container"></div>
+
+<style>
+  #hero-canvas-container {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+</style>
+
+<script>
+  import * as THREE from 'three';
+  import { RegularCards } from '../scripts/RegularCards.js';
+
+  const ANIMATION_SPEED = 1;
+  const MOUSE_INFLUENCE = 0.1;
+  const MOUSE_SMOOTHING = 0.08;
+  const MAX_MOUSE_OFFSET = 1.5;
+
+  let mouseX = 0;
+  let mouseY = 0;
+  let targetCameraX = 0;
+  let targetCameraY = 0;
+
+  const container = document.getElementById('hero-canvas-container');
+  if (!container) throw new Error('hero-canvas-container not found');
+
+  const width = container.offsetWidth;
+  const height = container.offsetHeight;
+
+  const camera = new THREE.PerspectiveCamera(60, width / height, 0.01, 100);
+  camera.position.z = 8;
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0a0a0a);
+
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+  scene.add(ambientLight);
+
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+  directionalLight.position.set(5, 5, 5);
+  scene.add(directionalLight);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(width, height);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  container.appendChild(renderer.domElement);
+
+  const textureLoader = new THREE.TextureLoader();
+  const slabPlasticMaterial = new THREE.MeshStandardMaterial({
+    color: 0x444444,
+    metalness: 0.8,
+    roughness: 0.1,
+    side: THREE.FrontSide,
+  });
+
+  const regularCardsManager = new RegularCards();
+  regularCardsManager.createCards(scene, textureLoader, slabPlasticMaterial);
+
+  window.addEventListener('mousemove', (event) => {
+    mouseX = -(event.clientX / window.innerWidth) * 2;
+    mouseY = (event.clientY / window.innerHeight) * 2;
+  });
+
+  window.addEventListener('resize', () => {
+    const w = container.offsetWidth;
+    const h = container.offsetHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+  });
+
+  function animate() {
+    requestAnimationFrame(animate);
+
+    const timer = 0.000005 * ANIMATION_SPEED * Date.now();
+    regularCardsManager.animate(timer, 0, ANIMATION_SPEED);
+
+    targetCameraX += (mouseX * MOUSE_INFLUENCE - targetCameraX) * MOUSE_SMOOTHING;
+    targetCameraY += (mouseY * MOUSE_INFLUENCE - targetCameraY) * MOUSE_SMOOTHING;
+
+    targetCameraX = Math.max(-MAX_MOUSE_OFFSET, Math.min(MAX_MOUSE_OFFSET, targetCameraX));
+    targetCameraY = Math.max(-MAX_MOUSE_OFFSET, Math.min(MAX_MOUSE_OFFSET, targetCameraY));
+
+    camera.position.x = targetCameraX;
+    camera.position.y = targetCameraY;
+    camera.position.z = 8;
+    camera.lookAt(targetCameraX * 0.5, targetCameraY * 0.5, 0);
+
+    renderer.render(scene, camera);
+  }
+
+  animate();
+</script>
