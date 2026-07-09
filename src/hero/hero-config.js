@@ -90,9 +90,9 @@ export function buildBackgroundCards(sourceCards, count = BACKGROUND_CARD_COUNT,
   return cards;
 }
 
-// Pure: read ?ogbg=<off|on> out of a location.search string. Background cards
-// are the production default (missing/unknown values stay on); ?ogbg=off
-// gives a clean side-by-side view of just the main 7, e.g. for client review.
+// Pure: read ?ogbg=<off|on> out of a location.search string. Main-7-only is
+// the production default (missing/unknown values stay off); ?ogbg=on adds
+// the background cards, e.g. for client review side by side.
 export function shouldShowBackgroundCards(searchString) {
   let value = null;
   try {
@@ -100,7 +100,7 @@ export function shouldShowBackgroundCards(searchString) {
   } catch {
     value = null;
   }
-  return value !== 'off';
+  return value === 'on';
 }
 
 // Card-holder styles selectable via ?ogholder=<name>. When the param is absent

@@ -98,15 +98,15 @@ test('background cards carry the fields cardTransform needs', () => {
   }
 });
 
-test('shouldShowBackgroundCards defaults to true (the "all cards" production look)', () => {
-  assert.equal(shouldShowBackgroundCards(''), true);
-  assert.equal(shouldShowBackgroundCards(undefined), true);
-  assert.equal(shouldShowBackgroundCards('?ogscroll=0&ogtime=5'), true);
-  assert.equal(shouldShowBackgroundCards('?ogbg=on'), true);
-  assert.equal(shouldShowBackgroundCards('?ogbg=anything-else'), true);
+test('shouldShowBackgroundCards defaults to false (the "main 7 only" production look)', () => {
+  assert.equal(shouldShowBackgroundCards(''), false);
+  assert.equal(shouldShowBackgroundCards(undefined), false);
+  assert.equal(shouldShowBackgroundCards('?ogscroll=0&ogtime=5'), false);
+  assert.equal(shouldShowBackgroundCards('?ogbg=off'), false);
+  assert.equal(shouldShowBackgroundCards('?ogbg=anything-else'), false);
 });
 
-test('shouldShowBackgroundCards is false only for ?ogbg=off (main-7-only view)', () => {
-  assert.equal(shouldShowBackgroundCards('?ogbg=off'), false);
-  assert.equal(shouldShowBackgroundCards('?ogholder=gloss&ogbg=off'), false);
+test('shouldShowBackgroundCards is true only for ?ogbg=on (all-cards view)', () => {
+  assert.equal(shouldShowBackgroundCards('?ogbg=on'), true);
+  assert.equal(shouldShowBackgroundCards('?ogholder=gloss&ogbg=on'), true);
 });

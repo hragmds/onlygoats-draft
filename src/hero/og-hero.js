@@ -11,8 +11,8 @@ export function initOgHero(container, options = {}) {
   const basePath = options.basePath || '';
   const cards = options.cards || buildCards(basePath);
   // Smaller, faster-drifting duplicate cards behind the main cluster (z < 0),
-  // derived from whichever main cards were resolved above. ?ogbg=off hides
-  // them for a clean side-by-side view of just the main 7 (e.g. client review).
+  // derived from whichever main cards were resolved above. Off by default;
+  // ?ogbg=on adds them for a side-by-side view against the main-7-only look.
   const showBackground = options.showBackgroundCards !== undefined
     ? options.showBackgroundCards
     : shouldShowBackgroundCards(location.search);
