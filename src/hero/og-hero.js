@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { SCENE, buildCards } from './hero-config.js';
+import { SCENE, buildCards, buildBackgroundCards } from './hero-config.js';
 import { computeScrollProgress, cardTransform, clamp } from './motion.js';
 import { resolveHolderStyle, createHolderResources, buildCardMesh } from './holders.js';
 
@@ -10,6 +10,10 @@ export function initOgHero(container, options = {}) {
   const cfg = { ...SCENE, ...(options.scene || {}) };
   const basePath = options.basePath || '';
   const cards = options.cards || buildCards(basePath);
+  // Smaller, faster-drifting duplicate cards behind the main cluster (z < 0),
+  // derived from whichever main cards were resolved above.
+  const backgroundCards = options.backgroundCards || buildBackgroundCards(cards);
+  const allCards = cards.concat(backgroundCards);
 
   const params = new URLSearchParams(location.search);
   const forcedParam = params.get('ogscroll');
@@ -46,8 +50,9 @@ export function initOgHero(container, options = {}) {
   const holders = createHolderResources(holderStyle, renderer);
   if (holders.environment) scene.environment = holders.environment;
 
-  const meshes = cards.map((card) => {
+  const meshes = allCards.map((card) => {
     const obj = buildCardMesh(card, holderStyle, holders);
+    if (card.scale) obj.scale.setScalar(card.scale);
     scene.add(obj);
     return obj;
   });

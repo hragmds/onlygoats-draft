@@ -1,0 +1,79 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import {
+  buildBackgroundCards,
+  BACKGROUND_CARD_COUNT,
+  BACKGROUND_SCALE_RANGE,
+  BACKGROUND_SPEED_MUL_RANGE,
+} from '../src/hero/hero-config.js';
+
+// Deterministic seeded PRNG (mulberry32) so buildBackgroundCards' randomness
+// is reproducible in tests instead of relying on true Math.random().
+function mulberry32(seed) {
+  let a = seed;
+  return function () {
+    a |= 0; a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+const SOURCE_CARDS = [
+  { src: '/assets/card-a.jpg' },
+  { src: '/assets/card-b.jpg' },
+  { src: '/assets/card-c.jpg' },
+];
+
+test('buildBackgroundCards returns the requested count', () => {
+  const cards = buildBackgroundCards(SOURCE_CARDS, 10, mulberry32(1));
+  assert.equal(cards.length, 10);
+});
+
+test('buildBackgroundCards defaults to BACKGROUND_CARD_COUNT when count is omitted', () => {
+  const cards = buildBackgroundCards(SOURCE_CARDS, undefined, mulberry32(2));
+  assert.equal(cards.length, BACKGROUND_CARD_COUNT);
+});
+
+test('every background card sits behind the main cluster (z < 0)', () => {
+  const cards = buildBackgroundCards(SOURCE_CARDS, 30, mulberry32(3));
+  for (const c of cards) assert.ok(c.z < 0, `expected z < 0, got ${c.z}`);
+});
+
+test('every background card is scaled within BACKGROUND_SCALE_RANGE (smaller than the main cards)', () => {
+  const cards = buildBackgroundCards(SOURCE_CARDS, 30, mulberry32(4));
+  const [lo, hi] = BACKGROUND_SCALE_RANGE;
+  for (const c of cards) {
+    assert.ok(c.scale >= lo && c.scale <= hi, `expected scale in [${lo},${hi}], got ${c.scale}`);
+  }
+});
+
+test('every background card floats faster than the main cards (floatSpeedMul > 1, within range)', () => {
+  const cards = buildBackgroundCards(SOURCE_CARDS, 30, mulberry32(5));
+  const [lo, hi] = BACKGROUND_SPEED_MUL_RANGE;
+  assert.ok(lo > 1, 'BACKGROUND_SPEED_MUL_RANGE must itself be faster than the base speed');
+  for (const c of cards) {
+    assert.ok(c.floatSpeedMul >= lo && c.floatSpeedMul <= hi, `expected floatSpeedMul in [${lo},${hi}], got ${c.floatSpeedMul}`);
+  }
+});
+
+test('every background card reuses one of the provided source images', () => {
+  const cards = buildBackgroundCards(SOURCE_CARDS, 20, mulberry32(6));
+  const validSrcs = new Set(SOURCE_CARDS.map((c) => c.src));
+  for (const c of cards) assert.ok(validSrcs.has(c.src), `unexpected src ${c.src}`);
+});
+
+test('buildBackgroundCards is deterministic for a given rng seed', () => {
+  const a = buildBackgroundCards(SOURCE_CARDS, 8, mulberry32(42));
+  const b = buildBackgroundCards(SOURCE_CARDS, 8, mulberry32(42));
+  assert.deepEqual(a, b);
+});
+
+test('background cards carry the fields cardTransform needs', () => {
+  const cards = buildBackgroundCards(SOURCE_CARDS, 5, mulberry32(7));
+  for (const c of cards) {
+    for (const k of ['x', 'y', 'z', 'rotX', 'rotY', 'rotZ', 'parallax', 'floatPhase', 'floatAmp', 'spin', 'floatSpeedMul', 'scale', 'src']) {
+      assert.ok(k in c, `background card missing ${k}`);
+    }
+  }
+});

@@ -13,10 +13,13 @@ export function computeScrollProgress(scrollY, driftDistance) {
 }
 
 // Absolute pose for a card given scroll + time. Cards drift UP as progress
-// rises, scaled by their parallax factor (near cards move more).
+// rises, scaled by their parallax factor (near cards move more). A card's own
+// floatSpeedMul (default 1) scales its idle float/sway speed independent of
+// every other card — used to make background filler cards drift faster.
 export function cardTransform(card, scrollProgress, timeSec, ranges) {
-  const float = Math.sin(timeSec * ranges.floatSpeed + card.floatPhase) * card.floatAmp;
-  const sway = Math.sin(timeSec * ranges.floatSpeed * 0.7 + card.floatPhase) * ranges.swayAmp;
+  const speed = ranges.floatSpeed * (card.floatSpeedMul || 1);
+  const float = Math.sin(timeSec * speed + card.floatPhase) * card.floatAmp;
+  const sway = Math.sin(timeSec * speed * 0.7 + card.floatPhase) * ranges.swayAmp;
   const driftY = scrollProgress * card.parallax * ranges.scrollDriftY;
   const driftZ = scrollProgress * card.parallax * ranges.scrollDriftZ;
   const spin = (card.spin || 0) * timeSec; // slow continuous turn about Y

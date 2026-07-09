@@ -48,3 +48,21 @@ test('cardTransform without a spin field does not rotate over time', () => {
   const card = { x: 0, y: 0, z: 0, rotX: 0, rotY: 0.3, rotZ: 0, parallax: 1, floatPhase: 0, floatAmp: 0 };
   assert.equal(cardTransform(card, 0, 99, ranges).rotY, 0.3);
 });
+
+test('cardTransform: floatSpeedMul makes a card float faster than the base speed', () => {
+  const ranges = { floatSpeed: 0.3, swayAmp: 0, scrollDriftY: 0, scrollDriftZ: 0 };
+  const base = { x: 0, y: 0, z: 0, rotX: 0, rotY: 0, rotZ: 0, parallax: 1, floatPhase: 0, floatAmp: 1 };
+  const fast = { ...base, floatSpeedMul: 3 };
+  // A 3x-faster card at t should match a base-speed card at 3t (same phase reached sooner).
+  const t = 1.7;
+  const fastY = cardTransform(fast, 0, t, ranges).y;
+  const equivBaseY = cardTransform(base, 0, t * 3, ranges).y;
+  assert.ok(Math.abs(fastY - equivBaseY) < 1e-9, 'floatSpeedMul=3 at t should match base speed at 3t');
+});
+
+test('cardTransform: no floatSpeedMul behaves exactly as multiplier 1 (unchanged default)', () => {
+  const ranges = { floatSpeed: 0.6, swayAmp: 0.04, scrollDriftY: 6, scrollDriftZ: 3 };
+  const card = { x: 0, y: 0, z: 0, rotX: 0, rotY: 0, rotZ: 0, parallax: 1, floatPhase: 0.5, floatAmp: 0.3 };
+  const withMul = { ...card, floatSpeedMul: 1 };
+  assert.deepEqual(cardTransform(card, 0.4, 2.1, ranges), cardTransform(withMul, 0.4, 2.1, ranges));
+});

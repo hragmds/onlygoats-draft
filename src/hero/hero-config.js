@@ -34,6 +34,50 @@ export function buildCards(basePath, layout = CARD_LAYOUT) {
   return layout.map((c) => ({ ...c, src: basePath + encodeURIComponent(c.file) }));
 }
 
+// Smaller, faster-drifting duplicate cards scattered behind the main cluster
+// for background depth. Fraction of the main cards' size, and how much faster
+// their idle float runs (a floatSpeedMul multiplier on top of SCENE.floatSpeed,
+// applied per-card by cardTransform).
+export const BACKGROUND_CARD_COUNT = 14;
+export const BACKGROUND_SCALE_RANGE = [0.25, 0.5];
+export const BACKGROUND_SPEED_MUL_RANGE = [2.0, 3.5];
+export const BACKGROUND_SPIN_RANGE = [0.16, 0.34]; // rad/sec magnitude — faster than the main 7 (~0.05-0.11)
+export const BACKGROUND_X_RANGE = [-10, 10];
+export const BACKGROUND_Y_RANGE = [-5, 5];
+export const BACKGROUND_Z_RANGE = [-3.6, -0.6]; // z < 0: behind the main cluster (z 0.2-2.4)
+
+function between(rng, [lo, hi]) {
+  return lo + rng() * (hi - lo);
+}
+
+// Derives .src from the already-resolved `sourceCards` (whatever those are —
+// Astro basePath-relative or Shopify CDN URLs) so this needs no per-host
+// wiring; it just duplicates whichever artwork was actually passed in.
+// `rng` is injectable so tests can pass a deterministic generator.
+export function buildBackgroundCards(sourceCards, count = BACKGROUND_CARD_COUNT, rng = Math.random) {
+  const cards = [];
+  for (let i = 0; i < count; i++) {
+    const source = sourceCards[Math.floor(rng() * sourceCards.length)];
+    const sign = () => (rng() < 0.5 ? -1 : 1);
+    cards.push({
+      src: source.src,
+      x: between(rng, BACKGROUND_X_RANGE),
+      y: between(rng, BACKGROUND_Y_RANGE),
+      z: between(rng, BACKGROUND_Z_RANGE),
+      rotX: sign() * rng() * 0.12,
+      rotY: sign() * rng() * 0.35,
+      rotZ: sign() * rng() * 0.18,
+      parallax: 0.2 + rng() * 0.25,
+      floatPhase: rng() * Math.PI * 2,
+      floatAmp: 0.10 + rng() * 0.16,
+      spin: sign() * between(rng, BACKGROUND_SPIN_RANGE),
+      floatSpeedMul: between(rng, BACKGROUND_SPEED_MUL_RANGE),
+      scale: between(rng, BACKGROUND_SCALE_RANGE),
+    });
+  }
+  return cards;
+}
+
 // Card-holder styles selectable via ?ogholder=<name>. When the param is absent
 // the engine uses 'gloss', the production look; ?ogholder=default restores the
 // original flat gray edge. All non-default styles share a procedural PMREM studio
