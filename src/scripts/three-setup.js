@@ -32,8 +32,8 @@ function animate() {
 
 const reviews = [
   "Adam is amazing to work with. Honest and a man of his word. And The Hair!!",
-  "The quality of the cards I received exceeded my expectations. Highly recommend!",
-  "Fast shipping and excellent customer service. Will definitely order again!",
+  "Great seller, great communication, fast delivery, and great card!! I would highly recommend. A++++ This is one of the top sellers I've experienced.",
+  "Great and wonderful! Item came in high-quality condition. Adam is very nice, and I highly enjoyed doing business with them.",
 ];
 
 let currentReview = 0;

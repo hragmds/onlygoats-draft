@@ -30,10 +30,8 @@
   const container = document.getElementById('hero-canvas-container');
   if (!container) throw new Error('hero-canvas-container not found');
 
-  const width = container.offsetWidth;
-  const height = container.offsetHeight;
-
-  const camera = new THREE.PerspectiveCamera(60, width / height, 0.01, 100);
+  // Use a placeholder aspect ratio — will be corrected once container has real size
+  const camera = new THREE.PerspectiveCamera(60, 16 / 9, 0.01, 100);
   camera.position.z = 8;
 
   const scene = new THREE.Scene();
@@ -47,7 +45,6 @@
   scene.add(directionalLight);
 
   const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setSize(width, height);
   renderer.setPixelRatio(window.devicePixelRatio);
   container.appendChild(renderer.domElement);
 
@@ -62,17 +59,22 @@
   const regularCardsManager = new RegularCards();
   regularCardsManager.createCards(scene, textureLoader, slabPlasticMaterial);
 
-  window.addEventListener('mousemove', (event) => {
-    mouseX = -(event.clientX / window.innerWidth) * 2;
-    mouseY = (event.clientY / window.innerHeight) * 2;
-  });
-
-  window.addEventListener('resize', () => {
+  function resize() {
     const w = container.offsetWidth;
     const h = container.offsetHeight;
+    if (w === 0 || h === 0) return;
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     renderer.setSize(w, h);
+  }
+
+  // Resize once layout is ready, then observe future changes
+  const ro = new ResizeObserver(() => resize());
+  ro.observe(container);
+
+  window.addEventListener('mousemove', (event) => {
+    mouseX = -(event.clientX / window.innerWidth) * 2;
+    mouseY = (event.clientY / window.innerHeight) * 2;
   });
 
   function animate() {
