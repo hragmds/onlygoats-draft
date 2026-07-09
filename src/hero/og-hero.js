@@ -10,7 +10,6 @@ export function initOgHero(container, options = {}) {
   const cfg = { ...SCENE, ...(options.scene || {}) };
   const basePath = options.basePath || '';
   const cards = options.cards || buildCards(basePath);
-  const backSrc = options.backSrc || basePath + 'back.png';
 
   const params = new URLSearchParams(location.search);
   const forcedParam = params.get('ogscroll');
@@ -38,15 +37,19 @@ export function initOgHero(container, options = {}) {
   container.appendChild(renderer.domElement);
 
   const loader = new THREE.TextureLoader();
-  const backTexture = loader.load(backSrc);
   const edge = new THREE.MeshStandardMaterial({ color: 0x3a3a3a, metalness: 0.7, roughness: 0.25 });
   const geometry = new RoundedBoxGeometry(1.5, 2.1, 0.05, 4, 0.06);
 
   const meshes = cards.map((card) => {
     const front = loader.load(card.src);
+    // Same card face on the back too, mirrored horizontally so it reads
+    // upright (not reversed) when the slow spin turns the card around.
+    const back = loader.load(card.src);
+    back.wrapS = THREE.RepeatWrapping;
+    back.repeat.x = -1;
     const materials = [edge, edge, edge, edge,
       new THREE.MeshStandardMaterial({ map: front }),
-      new THREE.MeshStandardMaterial({ map: backTexture })];
+      new THREE.MeshStandardMaterial({ map: back })];
     const mesh = new THREE.Mesh(geometry, materials);
     mesh.userData.card = card;
     scene.add(mesh);

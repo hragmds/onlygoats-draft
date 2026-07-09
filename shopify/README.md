@@ -23,13 +23,15 @@ upload:
 | `tiger-woods.jpg`      | `Tiger Woods Front.jpg`         |
 | `henderson-topps.jpg`  | `Henderson Topps front.jpg`     |
 | `jordan-star.jpg`      | `Jordan Star front.jpg`         |
-| `og-card-back.png`     | `back.png`                      |
+
+The card face is shown on both sides (mirrored so it reads upright when a card
+spins around), so no separate card-back image is needed.
 
 ## Install (Shopify admin)
 
 1. **Online Store → Themes → ⋯ → Edit code.**
-2. **Assets → Add a new asset**, upload `og-hero.min.js` and the seven images
-   named exactly as in the table above.
+2. **Assets → Add a new asset**, upload `og-hero.min.js` and the six card
+   images named exactly as in the table above.
 3. **Sections → Add a new section**, name it `og-hero`, delete the starter
    content, paste all of `og-hero.liquid`, and save.
 4. **Online Store → Themes → Customize** (theme editor):
