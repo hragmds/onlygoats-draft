@@ -12,8 +12,6 @@ export const SCENE = {
   swayAmp: 0.045,
   scrollDriftY: 2.6,
   scrollDriftZ: 1.4,
-  mouseInfluence: 0.35,
-  maxMouseOffset: 0.8,
   pixelRatioCap: 2,
 };
 

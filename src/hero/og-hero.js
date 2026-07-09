@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { SCENE, buildCards } from './hero-config.js';
-import { computeScrollProgress, cardTransform, cameraOffset, clamp } from './motion.js';
+import { computeScrollProgress, cardTransform, clamp } from './motion.js';
 
 export function initOgHero(container, options = {}) {
   if (!container) throw new Error('initOgHero: container is required');
@@ -59,14 +59,10 @@ export function initOgHero(container, options = {}) {
   const ranges = {
     floatSpeed: cfg.floatSpeed, swayAmp: cfg.swayAmp,
     scrollDriftY: cfg.scrollDriftY, scrollDriftZ: cfg.scrollDriftZ,
-    mouseInfluence: cfg.mouseInfluence, maxMouseOffset: cfg.maxMouseOffset,
   };
 
-  let mouseX = 0, mouseY = 0, camX = 0, camY = 0;
-  function onMouseMove(e) {
-    mouseX = (e.clientX / window.innerWidth) * 2 - 1;
-    mouseY = -((e.clientY / window.innerHeight) * 2 - 1);
-  }
+  camera.position.set(0, 0, cfg.cameraZ);
+  camera.lookAt(0, 0, 0);
 
   function resize() {
     const w = container.offsetWidth, h = container.offsetHeight;
@@ -77,22 +73,16 @@ export function initOgHero(container, options = {}) {
   }
 
   function frame(now, timeSec) {
-    const rect = container.getBoundingClientRect();
+    const scrollY = window.scrollY || window.pageYOffset || 0;
     const progress = forcedProgress !== null
       ? forcedProgress
-      : computeScrollProgress(rect.top, rect.height || container.offsetHeight);
+      : computeScrollProgress(scrollY, container.offsetHeight);
 
     for (const mesh of meshes) {
       const t = cardTransform(mesh.userData.card, progress, timeSec, ranges);
       mesh.position.set(t.x, t.y, t.z);
       mesh.rotation.set(t.rotX, t.rotY, t.rotZ);
     }
-
-    const target = cameraOffset(mouseX, mouseY, ranges);
-    camX += (target.x - camX) * 0.08;
-    camY += (target.y - camY) * 0.08;
-    camera.position.set(camX, camY, cfg.cameraZ);
-    camera.lookAt(camX * 0.5, camY * 0.5, 0);
 
     renderer.render(scene, camera);
   }
@@ -121,9 +111,8 @@ export function initOgHero(container, options = {}) {
   io.observe(container);
 
   if (reduceMotion) {
-    frame(0, 0); // one static composed frame, no loop, no mouse tracking
+    frame(0, 0); // one static composed frame, no loop
   } else {
-    window.addEventListener('mousemove', onMouseMove);
     rafId = requestAnimationFrame(loop);
   }
 
@@ -132,7 +121,6 @@ export function initOgHero(container, options = {}) {
       if (rafId !== null) cancelAnimationFrame(rafId);
       ro.disconnect();
       io.disconnect();
-      window.removeEventListener('mousemove', onMouseMove);
       renderer.dispose();
       if (renderer.domElement.parentNode) {
         renderer.domElement.parentNode.removeChild(renderer.domElement);

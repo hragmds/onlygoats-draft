@@ -27,7 +27,7 @@ test('buildCards prefixes and URL-encodes filenames', () => {
 });
 
 test('SCENE carries the constants the engine needs', () => {
-  for (const k of ['cameraZ', 'fov', 'background', 'floatSpeed', 'scrollDriftY', 'maxMouseOffset', 'pixelRatioCap']) {
+  for (const k of ['cameraZ', 'fov', 'background', 'floatSpeed', 'scrollDriftY', 'scrollDriftZ', 'pixelRatioCap']) {
     assert.ok(k in SCENE, `SCENE missing ${k}`);
   }
 });

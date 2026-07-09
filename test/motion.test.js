@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { clamp, computeScrollProgress, cardTransform, cameraOffset } from '../src/hero/motion.js';
+import { clamp, computeScrollProgress, cardTransform } from '../src/hero/motion.js';
 
 test('clamp bounds a value', () => {
   assert.equal(clamp(5, 0, 1), 1);
@@ -8,12 +8,12 @@ test('clamp bounds a value', () => {
   assert.equal(clamp(0.5, 0, 1), 0.5);
 });
 
-test('computeScrollProgress maps hero rect to 0..1', () => {
-  assert.equal(computeScrollProgress(0, 600), 0);      // pinned at top
-  assert.equal(computeScrollProgress(-300, 600), 0.5); // halfway out
-  assert.equal(computeScrollProgress(-600, 600), 1);   // fully out
-  assert.equal(computeScrollProgress(100, 600), 0);    // still below top -> clamped
-  assert.equal(computeScrollProgress(-9999, 600), 1);  // way past -> clamped
+test('computeScrollProgress maps scroll position to 0..1 from the first pixel', () => {
+  assert.equal(computeScrollProgress(0, 600), 0);     // top of page
+  assert.equal(computeScrollProgress(300, 600), 0.5); // scrolled halfway
+  assert.equal(computeScrollProgress(600, 600), 1);   // fully scrolled through
+  assert.equal(computeScrollProgress(900, 600), 1);   // past -> clamped
+  assert.equal(computeScrollProgress(-50, 600), 0);   // overscroll -> clamped
 });
 
 test('cardTransform at rest returns base pose', () => {
@@ -47,13 +47,4 @@ test('cardTransform without a spin field does not rotate over time', () => {
   const ranges = { floatSpeed: 0.6, swayAmp: 0, scrollDriftY: 6, scrollDriftZ: 3 };
   const card = { x: 0, y: 0, z: 0, rotX: 0, rotY: 0.3, rotZ: 0, parallax: 1, floatPhase: 0, floatAmp: 0 };
   assert.equal(cardTransform(card, 0, 99, ranges).rotY, 0.3);
-});
-
-test('cameraOffset scales and clamps mouse input', () => {
-  const ranges = { mouseInfluence: 0.35, maxMouseOffset: 0.8 };
-  const c = cameraOffset(0.5, -0.5, ranges);
-  assert.ok(Math.abs(c.x - 0.175) < 1e-9);
-  assert.ok(Math.abs(c.y + 0.175) < 1e-9);
-  assert.equal(cameraOffset(100, 100, ranges).x, 0.8);   // clamped high
-  assert.equal(cameraOffset(-100, -100, ranges).y, -0.8); // clamped low
 });

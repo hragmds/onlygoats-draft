@@ -4,12 +4,12 @@ export function clamp(v, lo, hi) {
   return Math.min(hi, Math.max(lo, v));
 }
 
-// rectTop: hero getBoundingClientRect().top; heroHeight: hero pixel height.
-// 0 while the hero sits at/below the viewport top, ramping to 1 once it has
-// scrolled a full height past the top.
-export function computeScrollProgress(rectTop, heroHeight) {
-  if (heroHeight <= 0) return 0;
-  return clamp(-rectTop / heroHeight, 0, 1);
+// scrollY: window scroll position; driftDistance: pixels of scroll over which
+// the parallax completes. 0 at the top of the page, ramping to 1 as the visitor
+// scrolls — so the effect responds from the first pixel of scroll.
+export function computeScrollProgress(scrollY, driftDistance) {
+  if (driftDistance <= 0) return 0;
+  return clamp(scrollY / driftDistance, 0, 1);
 }
 
 // Absolute pose for a card given scroll + time. Cards drift UP as progress
@@ -27,14 +27,5 @@ export function cardTransform(card, scrollProgress, timeSec, ranges) {
     rotX: card.rotX,
     rotY: card.rotY + spin,
     rotZ: card.rotZ + sway,
-  };
-}
-
-// Mouse in [-1,1] -> small clamped camera offset for subtle parallax tilt.
-export function cameraOffset(mouseX, mouseY, ranges) {
-  const m = ranges.maxMouseOffset;
-  return {
-    x: clamp(mouseX * ranges.mouseInfluence, -m, m),
-    y: clamp(mouseY * ranges.mouseInfluence, -m, m),
   };
 }
