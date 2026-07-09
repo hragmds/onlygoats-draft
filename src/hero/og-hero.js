@@ -64,12 +64,18 @@ export function initOgHero(container, options = {}) {
   camera.position.set(0, 0, cfg.cameraZ);
   camera.lookAt(0, 0, 0);
 
+  let lastW = 0, lastH = 0;
   function resize() {
     const w = container.offsetWidth, h = container.offsetHeight;
     if (!w || !h) return;
+    if (w === lastW && h === lastH) return; // ignore no-op ResizeObserver fires
+    lastW = w;
+    lastH = h;
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     renderer.setSize(w, h);
+    // Repaint immediately at the new size so a cleared buffer never gets shown.
+    renderer.render(scene, camera);
   }
 
   function frame(now, timeSec) {
