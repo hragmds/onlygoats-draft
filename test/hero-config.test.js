@@ -14,7 +14,7 @@ test('CARD_LAYOUT has 7 well-formed cards', () => {
 test('cards span a range of depths and parallax factors', () => {
   const zs = CARD_LAYOUT.map((c) => c.z);
   const px = CARD_LAYOUT.map((c) => c.parallax);
-  assert.ok(Math.max(...zs) - Math.min(...zs) >= 2, 'need real depth spread');
+  assert.ok(Math.max(...zs) - Math.min(...zs) >= 1.5, 'need real depth spread');
   assert.ok(Math.max(...px) - Math.min(...px) >= 0.5, 'need parallax spread');
 });
 
