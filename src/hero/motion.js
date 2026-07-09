@@ -19,12 +19,13 @@ export function cardTransform(card, scrollProgress, timeSec, ranges) {
   const sway = Math.sin(timeSec * ranges.floatSpeed * 0.7 + card.floatPhase) * ranges.swayAmp;
   const driftY = scrollProgress * card.parallax * ranges.scrollDriftY;
   const driftZ = scrollProgress * card.parallax * ranges.scrollDriftZ;
+  const spin = (card.spin || 0) * timeSec; // slow continuous turn about Y
   return {
     x: card.x,
     y: card.y + float - driftY,
     z: card.z + driftZ,
     rotX: card.rotX,
-    rotY: card.rotY,
+    rotY: card.rotY + spin,
     rotZ: card.rotZ + sway,
   };
 }

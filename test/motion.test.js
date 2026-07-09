@@ -36,6 +36,19 @@ test('cardTransform: near cards (higher parallax) drift more than far cards', ()
   assert.ok(nearY < 0, 'cards drift upward as scrollProgress increases');
 });
 
+test('cardTransform applies a slow continuous Y spin over time', () => {
+  const ranges = { floatSpeed: 0.6, swayAmp: 0, scrollDriftY: 6, scrollDriftZ: 3 };
+  const card = { x: 0, y: 0, z: 0, rotX: 0, rotY: 0.1, rotZ: 0, parallax: 1, floatPhase: 0, floatAmp: 0, spin: 0.2 };
+  assert.ok(Math.abs(cardTransform(card, 0, 0, ranges).rotY - 0.1) < 1e-9, 'at t=0, rotY is the base tilt');
+  assert.ok(Math.abs(cardTransform(card, 0, 10, ranges).rotY - (0.1 + 2.0)) < 1e-9, 'rotY advances by spin*time');
+});
+
+test('cardTransform without a spin field does not rotate over time', () => {
+  const ranges = { floatSpeed: 0.6, swayAmp: 0, scrollDriftY: 6, scrollDriftZ: 3 };
+  const card = { x: 0, y: 0, z: 0, rotX: 0, rotY: 0.3, rotZ: 0, parallax: 1, floatPhase: 0, floatAmp: 0 };
+  assert.equal(cardTransform(card, 0, 99, ranges).rotY, 0.3);
+});
+
 test('cameraOffset scales and clamps mouse input', () => {
   const ranges = { mouseInfluence: 0.35, maxMouseOffset: 0.8 };
   const c = cameraOffset(0.5, -0.5, ranges);

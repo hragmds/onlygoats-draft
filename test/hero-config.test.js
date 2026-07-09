@@ -5,7 +5,7 @@ import { SCENE, CARD_LAYOUT, buildCards } from '../src/hero/hero-config.js';
 test('CARD_LAYOUT has 6 well-formed cards', () => {
   assert.equal(CARD_LAYOUT.length, 6);
   for (const c of CARD_LAYOUT) {
-    for (const k of ['file', 'x', 'y', 'z', 'parallax', 'floatPhase', 'floatAmp']) {
+    for (const k of ['file', 'x', 'y', 'z', 'parallax', 'floatPhase', 'floatAmp', 'spin']) {
       assert.ok(k in c, `card missing ${k}`);
     }
   }

@@ -12,8 +12,11 @@ export function initOgHero(container, options = {}) {
   const cards = options.cards || buildCards(basePath);
   const backSrc = options.backSrc || basePath + 'back.png';
 
-  const forcedParam = new URLSearchParams(location.search).get('ogscroll');
+  const params = new URLSearchParams(location.search);
+  const forcedParam = params.get('ogscroll');
   const forcedProgress = forcedParam === null ? null : clamp(parseFloat(forcedParam), 0, 1);
+  const forcedTimeParam = params.get('ogtime');
+  const forcedTime = forcedTimeParam === null ? null : parseFloat(forcedTimeParam);
   const reduceMotion = window.matchMedia
     && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -100,7 +103,7 @@ export function initOgHero(container, options = {}) {
   let visible = true;
   function loop(now) {
     rafId = requestAnimationFrame(loop);
-    frame(now, now * 0.001);
+    frame(now, forcedTime !== null ? forcedTime : now * 0.001);
   }
 
   const io = new IntersectionObserver((entries) => {
