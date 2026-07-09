@@ -5,6 +5,7 @@ import {
   BACKGROUND_CARD_COUNT,
   BACKGROUND_SCALE_RANGE,
   BACKGROUND_SPEED_MUL_RANGE,
+  BACKGROUND_SWEEP_SPEED_RANGE,
 } from '../src/hero/hero-config.js';
 
 // Deterministic seeded PRNG (mulberry32) so buildBackgroundCards' randomness
@@ -57,6 +58,16 @@ test('every background card floats faster than the main cards (floatSpeedMul > 1
   }
 });
 
+test('every background card sweeps bottom-left -> top-right instead of bobbing up/down', () => {
+  const cards = buildBackgroundCards(SOURCE_CARDS, 30, mulberry32(8));
+  const [lo, hi] = BACKGROUND_SWEEP_SPEED_RANGE;
+  assert.ok(lo > 0, 'BACKGROUND_SWEEP_SPEED_RANGE must be a positive (forward) speed');
+  for (const c of cards) {
+    assert.ok(c.sweepSpeed >= lo && c.sweepSpeed <= hi, `expected sweepSpeed in [${lo},${hi}], got ${c.sweepSpeed}`);
+    assert.ok(!('floatAmp' in c), 'background cards should no longer carry an unused floatAmp (replaced by the sweep)');
+  }
+});
+
 test('every background card reuses one of the provided source images', () => {
   const cards = buildBackgroundCards(SOURCE_CARDS, 20, mulberry32(6));
   const validSrcs = new Set(SOURCE_CARDS.map((c) => c.src));
@@ -80,7 +91,7 @@ test('buildBackgroundCards is deterministic for a given rng seed', () => {
 test('background cards carry the fields cardTransform needs', () => {
   const cards = buildBackgroundCards(SOURCE_CARDS, 5, mulberry32(7));
   for (const c of cards) {
-    for (const k of ['x', 'y', 'z', 'rotX', 'rotY', 'rotZ', 'parallax', 'floatPhase', 'floatAmp', 'spin', 'floatSpeedMul', 'scale', 'src']) {
+    for (const k of ['x', 'y', 'z', 'rotX', 'rotY', 'rotZ', 'parallax', 'floatPhase', 'sweepSpeed', 'spin', 'floatSpeedMul', 'scale', 'src']) {
       assert.ok(k in c, `background card missing ${k}`);
     }
   }

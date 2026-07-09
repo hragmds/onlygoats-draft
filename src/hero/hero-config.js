@@ -41,10 +41,12 @@ export function buildCards(basePath, layout = CARD_LAYOUT) {
   return layout.map((c) => ({ ...c, src: basePath + encodeURIComponent(c.file) }));
 }
 
-// Smaller, faster-drifting duplicate cards scattered behind the main cluster
-// for background depth. Fraction of the main cards' size, and how much faster
-// their idle float runs (a floatSpeedMul multiplier on top of SCENE.floatSpeed,
-// applied per-card by cardTransform).
+// Smaller duplicate cards scattered behind the main cluster for background
+// depth. Fraction of the main cards' size. Instead of the main cards' up/down
+// bob, each creeps in a super-slow, one-directional diagonal sweep from
+// bottom-left toward top-right (sweepSpeed, cardTransform's linear-drift
+// branch), starting from wherever it spawned. Rotation sway/spin still run at
+// a faster pace than the main 7 (floatSpeedMul, spin), unaffected by the sweep.
 export const BACKGROUND_CARD_COUNT = 14;
 export const BACKGROUND_SCALE_RANGE = [0.25, 0.5];
 export const BACKGROUND_SPEED_MUL_RANGE = [2.0, 3.5];
@@ -52,6 +54,7 @@ export const BACKGROUND_SPIN_RANGE = [0.16, 0.34]; // rad/sec magnitude — fast
 export const BACKGROUND_X_RANGE = [-10, 10];
 export const BACKGROUND_Y_RANGE = [-5, 5];
 export const BACKGROUND_Z_RANGE = [-3.6, -0.6]; // z < 0: behind the main cluster (z 0.2-2.4)
+export const BACKGROUND_SWEEP_SPEED_RANGE = [0.02, 0.05]; // world units/sec, bottom-left -> top-right diagonal
 
 function between(rng, [lo, hi]) {
   return lo + rng() * (hi - lo);
@@ -78,7 +81,7 @@ export function buildBackgroundCards(sourceCards, count = BACKGROUND_CARD_COUNT,
       rotZ: sign() * rng() * 0.18,
       parallax: 0.2 + rng() * 0.25,
       floatPhase: rng() * Math.PI * 2,
-      floatAmp: 0.10 + rng() * 0.16,
+      sweepSpeed: between(rng, BACKGROUND_SWEEP_SPEED_RANGE),
       spin: sign() * between(rng, BACKGROUND_SPIN_RANGE),
       floatSpeedMul: between(rng, BACKGROUND_SPEED_MUL_RANGE),
       scale: between(rng, BACKGROUND_SCALE_RANGE),
