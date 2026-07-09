@@ -8,16 +8,20 @@ test('every named style resolves to itself', () => {
   }
 });
 
-test('absent param falls back to default', () => {
-  assert.equal(resolveHolderStyle(''), 'default');
-  assert.equal(resolveHolderStyle('?ogscroll=0&ogtime=2.5'), 'default');
-  assert.equal(resolveHolderStyle(undefined), 'default');
+test('absent param falls back to gloss, the production look', () => {
+  assert.equal(resolveHolderStyle(''), 'gloss');
+  assert.equal(resolveHolderStyle('?ogscroll=0&ogtime=2.5'), 'gloss');
+  assert.equal(resolveHolderStyle(undefined), 'gloss');
 });
 
-test('junk or unknown values fall back to default', () => {
-  assert.equal(resolveHolderStyle('?ogholder=sparkle'), 'default');
-  assert.equal(resolveHolderStyle('?ogholder='), 'default');
-  assert.equal(resolveHolderStyle('?ogholder=ACRYLIC'), 'default'); // case-sensitive by design
+test('junk or unknown values fall back to gloss', () => {
+  assert.equal(resolveHolderStyle('?ogholder=sparkle'), 'gloss');
+  assert.equal(resolveHolderStyle('?ogholder='), 'gloss');
+  assert.equal(resolveHolderStyle('?ogholder=ACRYLIC'), 'gloss'); // case-sensitive by design
+});
+
+test('the original look stays reachable by name', () => {
+  assert.equal(resolveHolderStyle('?ogholder=default'), 'default');
 });
 
 test('the four shiny styles need an environment map, default does not', () => {

@@ -1,9 +1,10 @@
 // Card-holder variants for the OG hero. resolveHolderStyle is pure (no THREE,
 // no DOM) so it can be unit-tested; everything else builds Three objects.
 //
-// Styles: 'default' reproduces the original flat-gray-edge card exactly.
-// 'acrylic' / 'slab' / 'gloss' / 'frame' are the shiny variants and all rely on
-// a shared PMREM environment (createHolderResources) for their reflections.
+// Styles: 'gloss' is the production look (clearcoated faces, polished metal
+// edge). 'acrylic' / 'slab' / 'frame' are the alternate shiny variants; all
+// four rely on a shared PMREM environment (createHolderResources) for their
+// reflections. 'default' reproduces the original flat-gray-edge card exactly.
 
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
@@ -11,8 +12,10 @@ import { HOLDERS } from './hero-config.js';
 
 export const HOLDER_STYLES = ['acrylic', 'slab', 'gloss', 'frame'];
 
-// Pure: read ?ogholder=<name> out of a location.search string. Unknown or
-// missing values fall back to 'default' so the hero is unchanged without opt-in.
+// Pure: read ?ogholder=<name> out of a location.search string. 'gloss' is the
+// chosen production look, so unknown or missing values land there; the other
+// styles (and 'default', the original flat-gray edge) remain reachable by name
+// for side-by-side comparison.
 export function resolveHolderStyle(searchString) {
   let value = null;
   try {
@@ -20,7 +23,8 @@ export function resolveHolderStyle(searchString) {
   } catch {
     value = null;
   }
-  return HOLDER_STYLES.includes(value) ? value : 'default';
+  if (value === 'default' || HOLDER_STYLES.includes(value)) return value;
+  return 'gloss';
 }
 
 export function styleNeedsEnvironment(style) {

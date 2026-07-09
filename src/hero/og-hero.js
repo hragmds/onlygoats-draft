@@ -36,11 +36,12 @@ export function initOgHero(container, options = {}) {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, cfg.pixelRatioCap));
   container.appendChild(renderer.domElement);
 
-  // Holder style comes from ?ogholder=<name>; 'default' leaves the renderer and
-  // materials exactly as they were. Shiny styles reflect a procedural env map
-  // (built once, below). The renderer stays in its legacy color path on purpose
-  // so the photographic card artwork keeps the exact vividness of the default
-  // look — the shine comes from the env map + materials, not tone mapping.
+  // Holder style defaults to 'gloss' (the production look); ?ogholder=<name>
+  // switches to an alternate style, including 'default' for the original flat
+  // gray edge. Shiny styles reflect a procedural env map (built once, below).
+  // The renderer stays in its legacy color path on purpose so the photographic
+  // card artwork keeps its exact vividness — the shine comes from the env map
+  // + materials, not tone mapping.
   const holderStyle = resolveHolderStyle(location.search);
   const holders = createHolderResources(holderStyle, renderer);
   if (holders.environment) scene.environment = holders.environment;

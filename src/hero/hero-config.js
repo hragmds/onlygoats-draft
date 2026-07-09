@@ -35,8 +35,8 @@ export function buildCards(basePath, layout = CARD_LAYOUT) {
 }
 
 // Card-holder styles selectable via ?ogholder=<name>. When the param is absent
-// the engine uses the 'default' look (flat gray edge, no env map) and none of
-// these tunables apply. All non-default styles share a procedural PMREM studio
+// the engine uses 'gloss', the production look; ?ogholder=default restores the
+// original flat gray edge. All non-default styles share a procedural PMREM studio
 // (HOLDERS.env) so metal/acrylic surfaces have something bright to reflect
 // against the near-black scene. The renderer stays in its legacy color path
 // (no tone mapping) so the card artwork keeps its default vividness; shine
