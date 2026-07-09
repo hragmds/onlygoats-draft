@@ -1,0 +1,50 @@
+{%- comment -%} OnlyGoatz parallax hero — replaces the video slideshow. {%- endcomment -%}
+<section class="og-hero" data-og-hero
+  style="position:relative;width:100%;height:{{ section.settings.height }}px;background:#0b0b0f;overflow:hidden;">
+  <div class="og-hero__canvas" style="position:absolute;inset:0;"></div>
+  <div class="og-hero__vignette" style="position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(ellipse at 50% 42%, transparent 55%, rgba(0,0,0,.55) 100%);"></div>
+  <div class="og-hero__content" style="position:absolute;inset:0;z-index:2;display:flex;
+    flex-direction:column;align-items:center;justify-content:center;gap:32px;text-align:center;">
+    <h2 style="color:#fff;font:700 clamp(32px,5vw,56px)/1.1 Inter,sans-serif;margin:0;">
+      {{ section.settings.line1 }}<br>{{ section.settings.line2 }}
+    </h2>
+    <a href="{{ section.settings.button_url }}"
+      style="padding:14px 32px;background:#fff;color:#000;border-radius:50px;
+      font:600 14px Inter,sans-serif;text-decoration:none;">{{ section.settings.button_text }}</a>
+  </div>
+</section>
+
+<script src="{{ 'og-hero.min.js' | asset_url }}" defer></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var el = document.querySelector('#shopify-section-{{ section.id }} [data-og-hero] .og-hero__canvas');
+    if (el && window.OGHero) {
+      window.OGHero.init(el, {
+        cards: [
+          { src: "{{ 'jordan-fleer.jpg' | asset_url }}", x: -6.6, y: 2.5, z: 2.2, rotX: 0.02, rotY: 0.28, rotZ: -0.14, parallax: 1.10, floatPhase: 0.0, floatAmp: 0.20 },
+          { src: "{{ 'gretzky-opc.jpg' | asset_url }}", x: 6.4, y: 2.1, z: 1.4, rotX: -0.03, rotY: -0.26, rotZ: 0.12, parallax: 0.95, floatPhase: 1.1, floatAmp: 0.18 },
+          { src: "{{ 'trout-bowman.jpg' | asset_url }}", x: -5.6, y: -2.6, z: 1.8, rotX: 0.03, rotY: 0.22, rotZ: 0.10, parallax: 1.00, floatPhase: 2.3, floatAmp: 0.18 },
+          { src: "{{ 'tiger-woods.jpg' | asset_url }}", x: 5.9, y: -2.5, z: 0.6, rotX: -0.02, rotY: -0.18, rotZ: -0.10, parallax: 0.80, floatPhase: 3.0, floatAmp: 0.16 },
+          { src: "{{ 'henderson-topps.jpg' | asset_url }}", x: -9.0, y: 0.3, z: -1.6, rotX: 0.00, rotY: 0.14, rotZ: 0.05, parallax: 0.45, floatPhase: 0.7, floatAmp: 0.12 },
+          { src: "{{ 'jordan-star.jpg' | asset_url }}", x: 8.8, y: -0.2, z: -2.0, rotX: 0.02, rotY: -0.12, rotZ: 0.08, parallax: 0.35, floatPhase: 4.2, floatAmp: 0.11 }
+        ],
+        backSrc: "{{ 'og-card-back.png' | asset_url }}"
+      });
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "OG Parallax Hero",
+  "settings": [
+    { "type": "text", "id": "line1", "label": "Headline line 1", "default": "Unbox the Legends." },
+    { "type": "text", "id": "line2", "label": "Headline line 2", "default": "Discover Your GOAT." },
+    { "type": "text", "id": "button_text", "label": "Button text", "default": "Shop Now" },
+    { "type": "url", "id": "button_url", "label": "Button link" },
+    { "type": "range", "id": "height", "label": "Height (px)", "min": 400, "max": 800, "step": 20, "default": 600 }
+  ],
+  "presets": [{ "name": "OG Parallax Hero" }]
+}
+{% endschema %}
