@@ -90,6 +90,19 @@ export function buildBackgroundCards(sourceCards, count = BACKGROUND_CARD_COUNT,
   return cards;
 }
 
+// Pure: read ?ogbg=<off|on> out of a location.search string. Background cards
+// are the production default (missing/unknown values stay on); ?ogbg=off
+// gives a clean side-by-side view of just the main 7, e.g. for client review.
+export function shouldShowBackgroundCards(searchString) {
+  let value = null;
+  try {
+    value = new URLSearchParams(searchString || '').get('ogbg');
+  } catch {
+    value = null;
+  }
+  return value !== 'off';
+}
+
 // Card-holder styles selectable via ?ogholder=<name>. When the param is absent
 // the engine uses 'gloss', the production look; ?ogholder=default restores the
 // original flat gray edge. All non-default styles share a procedural PMREM studio

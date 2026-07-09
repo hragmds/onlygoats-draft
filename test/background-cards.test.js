@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   buildBackgroundCards,
+  shouldShowBackgroundCards,
   BACKGROUND_CARD_COUNT,
   BACKGROUND_SCALE_RANGE,
   BACKGROUND_SPEED_MUL_RANGE,
@@ -95,4 +96,17 @@ test('background cards carry the fields cardTransform needs', () => {
       assert.ok(k in c, `background card missing ${k}`);
     }
   }
+});
+
+test('shouldShowBackgroundCards defaults to true (the "all cards" production look)', () => {
+  assert.equal(shouldShowBackgroundCards(''), true);
+  assert.equal(shouldShowBackgroundCards(undefined), true);
+  assert.equal(shouldShowBackgroundCards('?ogscroll=0&ogtime=5'), true);
+  assert.equal(shouldShowBackgroundCards('?ogbg=on'), true);
+  assert.equal(shouldShowBackgroundCards('?ogbg=anything-else'), true);
+});
+
+test('shouldShowBackgroundCards is false only for ?ogbg=off (main-7-only view)', () => {
+  assert.equal(shouldShowBackgroundCards('?ogbg=off'), false);
+  assert.equal(shouldShowBackgroundCards('?ogholder=gloss&ogbg=off'), false);
 });

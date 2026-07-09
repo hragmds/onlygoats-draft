@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { SCENE, buildCards, buildBackgroundCards } from './hero-config.js';
+import { SCENE, buildCards, buildBackgroundCards, shouldShowBackgroundCards } from './hero-config.js';
 import { computeScrollProgress, cardTransform, clamp } from './motion.js';
 import { resolveHolderStyle, createHolderResources, buildCardMesh } from './holders.js';
 
@@ -11,8 +11,12 @@ export function initOgHero(container, options = {}) {
   const basePath = options.basePath || '';
   const cards = options.cards || buildCards(basePath);
   // Smaller, faster-drifting duplicate cards behind the main cluster (z < 0),
-  // derived from whichever main cards were resolved above.
-  const backgroundCards = options.backgroundCards || buildBackgroundCards(cards);
+  // derived from whichever main cards were resolved above. ?ogbg=off hides
+  // them for a clean side-by-side view of just the main 7 (e.g. client review).
+  const showBackground = options.showBackgroundCards !== undefined
+    ? options.showBackgroundCards
+    : shouldShowBackgroundCards(location.search);
+  const backgroundCards = showBackground ? (options.backgroundCards || buildBackgroundCards(cards)) : [];
   const allCards = cards.concat(backgroundCards);
 
   const params = new URLSearchParams(location.search);
