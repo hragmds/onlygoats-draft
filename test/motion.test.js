@@ -1,0 +1,46 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { clamp, computeScrollProgress, cardTransform, cameraOffset } from '../src/hero/motion.js';
+
+test('clamp bounds a value', () => {
+  assert.equal(clamp(5, 0, 1), 1);
+  assert.equal(clamp(-5, 0, 1), 0);
+  assert.equal(clamp(0.5, 0, 1), 0.5);
+});
+
+test('computeScrollProgress maps hero rect to 0..1', () => {
+  assert.equal(computeScrollProgress(0, 600), 0);      // pinned at top
+  assert.equal(computeScrollProgress(-300, 600), 0.5); // halfway out
+  assert.equal(computeScrollProgress(-600, 600), 1);   // fully out
+  assert.equal(computeScrollProgress(100, 600), 0);    // still below top -> clamped
+  assert.equal(computeScrollProgress(-9999, 600), 1);  // way past -> clamped
+});
+
+test('cardTransform at rest returns base pose', () => {
+  const card = { x: 1, y: 2, z: 3, rotX: 0.1, rotY: 0.2, rotZ: 0.3, parallax: 1, floatPhase: 0, floatAmp: 0.2 };
+  const ranges = { floatSpeed: 0.6, swayAmp: 0.04, scrollDriftY: 6, scrollDriftZ: 3 };
+  const t = cardTransform(card, 0, 0, ranges); // sin(0)=0 -> no float, no drift
+  assert.equal(t.x, 1);
+  assert.equal(t.y, 2);
+  assert.equal(t.z, 3);
+  assert.equal(t.rotZ, 0.3);
+});
+
+test('cardTransform: near cards (higher parallax) drift more than far cards', () => {
+  const ranges = { floatSpeed: 0.6, swayAmp: 0.04, scrollDriftY: 6, scrollDriftZ: 3 };
+  const near = { x: 0, y: 0, z: 0, rotX: 0, rotY: 0, rotZ: 0, parallax: 1.0, floatPhase: 0, floatAmp: 0 };
+  const far  = { x: 0, y: 0, z: 0, rotX: 0, rotY: 0, rotZ: 0, parallax: 0.3, floatPhase: 0, floatAmp: 0 };
+  const nearY = cardTransform(near, 1, 0, ranges).y;
+  const farY  = cardTransform(far, 1, 0, ranges).y;
+  assert.ok(nearY < farY, `near ${nearY} should drift above far ${farY}`);
+  assert.ok(nearY < 0, 'cards drift upward as scrollProgress increases');
+});
+
+test('cameraOffset scales and clamps mouse input', () => {
+  const ranges = { mouseInfluence: 0.35, maxMouseOffset: 0.8 };
+  const c = cameraOffset(0.5, -0.5, ranges);
+  assert.ok(Math.abs(c.x - 0.175) < 1e-9);
+  assert.ok(Math.abs(c.y + 0.175) < 1e-9);
+  assert.equal(cameraOffset(100, 100, ranges).x, 0.8);   // clamped high
+  assert.equal(cameraOffset(-100, -100, ranges).y, -0.8); // clamped low
+});
