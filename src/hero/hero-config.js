@@ -20,14 +20,21 @@ export const SCENE = {
 // from the center and from its neighbours. `spin` gives each card a slow
 // continuous turn about Y (rad/sec, alternating direction). Higher-parallax
 // cards move most on scroll.
+//
+// `w`/`h` are each card's true aspect ratio (measured from the actual source
+// image — these are photos of the full graded slab, not a bare 2.5x3.5in card,
+// so they're taller/narrower than that ratio) at a constant area equal to the
+// original fixed 1.5x2.1 plane. Without this, every card gets non-uniformly
+// stretched ~13-22% wider to fill a bare-card-shaped plane its photo doesn't
+// match. See holders.js buildCardMesh — geometry is sized per-card from these.
 export const CARD_LAYOUT = [
-  { file: 'Jordan Fleer front.jpg',      x:  0.00, y:  0.00, z:  2.4, rotX:  0.00, rotY:  0.00, rotZ: -0.03, parallax: 1.25, floatPhase: 0.0, floatAmp: 0.16, spin:  0.06 }, // center
-  { file: 'Jordan Star front.jpg',       x: -2.75, y:  2.00, z:  0.9, rotX:  0.02, rotY:  0.16, rotZ:  0.10, parallax: 0.95, floatPhase: 4.2, floatAmp: 0.15, spin: -0.09 }, // upper-left
-  { file: 'Gretzky OPC front.jpg',       x:  2.75, y:  2.00, z:  0.8, rotX:  0.02, rotY: -0.16, rotZ: -0.08, parallax: 1.05, floatPhase: 1.1, floatAmp: 0.15, spin: -0.07 }, // upper-right
-  { file: 'Henderson Topps front.jpg',   x:  5.40, y:  0.00, z:  0.4, rotX:  0.00, rotY: -0.22, rotZ:  0.05, parallax: 0.70, floatPhase: 0.7, floatAmp: 0.14, spin: -0.05 }, // right side card
-  { file: 'Tiger Woods Front.jpg',       x:  2.50, y: -2.00, z:  0.9, rotX: -0.02, rotY: -0.16, rotZ: -0.10, parallax: 0.90, floatPhase: 3.0, floatAmp: 0.15, spin:  0.10 }, // lower-right
-  { file: 'Trout Bowman Auto front.jpg', x: -2.50, y: -2.00, z:  0.2, rotX: -0.02, rotY:  0.16, rotZ:  0.08, parallax: 1.00, floatPhase: 2.3, floatAmp: 0.15, spin:  0.11 }, // lower-left
-  { file: 'Kiss Comic Front.jpg',        x: -5.39, y:  0.00, z:  0.7, rotX:  0.00, rotY:  0.22, rotZ: -0.05, parallax: 0.80, floatPhase: 5.5, floatAmp: 0.14, spin:  0.08 }, // left side card
+  { file: 'Jordan Fleer front.jpg',      w: 1.357, h: 2.322, x:  0.00, y:  0.00, z:  2.4, rotX:  0.00, rotY:  0.00, rotZ: -0.03, parallax: 1.25, floatPhase: 0.0, floatAmp: 0.16, spin:  0.06 }, // center
+  { file: 'Jordan Star front.jpg',       w: 1.412, h: 2.231, x: -2.75, y:  2.00, z:  0.9, rotX:  0.02, rotY:  0.16, rotZ:  0.10, parallax: 0.95, floatPhase: 4.2, floatAmp: 0.15, spin: -0.09 }, // upper-left
+  { file: 'Gretzky OPC front.jpg',       w: 1.362, h: 2.312, x:  2.75, y:  2.00, z:  0.8, rotX:  0.02, rotY: -0.16, rotZ: -0.08, parallax: 1.05, floatPhase: 1.1, floatAmp: 0.15, spin: -0.07 }, // upper-right
+  { file: 'Henderson Topps front.jpg',   w: 1.359, h: 2.318, x:  5.40, y:  0.00, z:  0.4, rotX:  0.00, rotY: -0.22, rotZ:  0.05, parallax: 0.70, floatPhase: 0.7, floatAmp: 0.14, spin: -0.05 }, // right side card
+  { file: 'Tiger Woods Front.jpg',       w: 1.411, h: 2.232, x:  2.50, y: -2.00, z:  0.9, rotX: -0.02, rotY: -0.16, rotZ: -0.10, parallax: 0.90, floatPhase: 3.0, floatAmp: 0.15, spin:  0.10 }, // lower-right
+  { file: 'Trout Bowman Auto front.jpg', w: 1.360, h: 2.316, x: -2.50, y: -2.00, z:  0.2, rotX: -0.02, rotY:  0.16, rotZ:  0.08, parallax: 1.00, floatPhase: 2.3, floatAmp: 0.15, spin:  0.11 }, // lower-left
+  { file: 'Kiss Comic Front.jpg',        w: 1.491, h: 2.112, x: -5.39, y:  0.00, z:  0.7, rotX:  0.00, rotY:  0.22, rotZ: -0.05, parallax: 0.80, floatPhase: 5.5, floatAmp: 0.14, spin:  0.08 }, // left side card
 ];
 
 export function buildCards(basePath, layout = CARD_LAYOUT) {
@@ -61,6 +68,8 @@ export function buildBackgroundCards(sourceCards, count = BACKGROUND_CARD_COUNT,
     const sign = () => (rng() < 0.5 ? -1 : 1);
     cards.push({
       src: source.src,
+      w: source.w || 1.5,
+      h: source.h || 2.1,
       x: between(rng, BACKGROUND_X_RANGE),
       y: between(rng, BACKGROUND_Y_RANGE),
       z: between(rng, BACKGROUND_Z_RANGE),

@@ -20,9 +20,9 @@ function mulberry32(seed) {
 }
 
 const SOURCE_CARDS = [
-  { src: '/assets/card-a.jpg' },
-  { src: '/assets/card-b.jpg' },
-  { src: '/assets/card-c.jpg' },
+  { src: '/assets/card-a.jpg', w: 1.357, h: 2.322 },
+  { src: '/assets/card-b.jpg', w: 1.412, h: 2.231 },
+  { src: '/assets/card-c.jpg', w: 1.491, h: 2.112 },
 ];
 
 test('buildBackgroundCards returns the requested count', () => {
@@ -61,6 +61,14 @@ test('every background card reuses one of the provided source images', () => {
   const cards = buildBackgroundCards(SOURCE_CARDS, 20, mulberry32(6));
   const validSrcs = new Set(SOURCE_CARDS.map((c) => c.src));
   for (const c of cards) assert.ok(validSrcs.has(c.src), `unexpected src ${c.src}`);
+});
+
+test('every background card keeps the true w/h of the source image it duplicates (not stretched)', () => {
+  const cards = buildBackgroundCards(SOURCE_CARDS, 20, mulberry32(9));
+  const validPairs = new Set(SOURCE_CARDS.map((c) => `${c.w}x${c.h}`));
+  for (const c of cards) {
+    assert.ok(validPairs.has(`${c.w}x${c.h}`), `${c.src} got w/h ${c.w}x${c.h}, not matching any source card's real ratio`);
+  }
 });
 
 test('buildBackgroundCards is deterministic for a given rng seed', () => {

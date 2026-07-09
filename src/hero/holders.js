@@ -95,6 +95,12 @@ function cached(shared, key, factory) {
   return shared.cache[key];
 }
 
+// Each card's true w/h (measured from its actual image, set in CARD_LAYOUT /
+// buildBackgroundCards) — falls back to the original fixed size if absent.
+function cardSize(card) {
+  return { w: card.w || HOLDERS.innerCard.w, h: card.h || HOLDERS.innerCard.h };
+}
+
 // Front + mirrored-back artwork textures for one card. The back repeats with
 // x = -1 so the image reads upright when the slow spin turns the card around.
 function loadFaces(shared, card) {
@@ -109,8 +115,9 @@ function loadFaces(shared, card) {
 // acrylic, slab and frame styles. Fresh face materials per card, shared edge.
 function buildInnerCard(shared, card) {
   const c = HOLDERS.innerCard;
-  const geo = cached(shared, 'innerGeo',
-    () => new RoundedBoxGeometry(c.w, c.h, c.d, 4, c.radius));
+  const { w, h } = cardSize(card);
+  const geo = cached(shared, `innerGeo:${w}x${h}`,
+    () => new RoundedBoxGeometry(w, h, c.d, 4, c.radius));
   const edge = cached(shared, 'innerEdge',
     () => new THREE.MeshStandardMaterial({
       color: c.edgeColor, metalness: 0.3, roughness: c.edgeRoughness,
@@ -138,10 +145,15 @@ function glassMaterial(spec) {
 // face groups take two materials: the front/back (indices 4,5) get the clear
 // `face`, the four sides (0-3, which own the grazing outer bevel) get the
 // reflective `edge`. So the artwork shows through cleanly while the rim glints.
+// The shell's margin around the card (its designed size minus the reference
+// innerCard size) is preserved as each card is sized to its own true w/h.
 function buildEncased(shared, card, c, key) {
   const group = new THREE.Group();
-  const geo = cached(shared, key + 'Geo',
-    () => new RoundedBoxGeometry(c.shell.w, c.shell.h, c.shell.d, c.shell.segments, c.shell.radius));
+  const { w, h } = cardSize(card);
+  const marginW = c.shell.w - HOLDERS.innerCard.w;
+  const marginH = c.shell.h - HOLDERS.innerCard.h;
+  const geo = cached(shared, `${key}Geo:${w}x${h}`,
+    () => new RoundedBoxGeometry(w + marginW, h + marginH, c.shell.d, c.shell.segments, c.shell.radius));
   const face = cached(shared, key + 'Face', () => glassMaterial(c.face));
   const edge = cached(shared, key + 'Edge', () => glassMaterial(c.edge));
   const shell = new THREE.Mesh(geo, [edge, edge, edge, edge, face, face]);
@@ -153,8 +165,9 @@ function buildEncased(shared, card, c, key) {
 // --- per-style builders -----------------------------------------------------
 
 function buildDefault(shared, card) {
-  const geo = cached(shared, 'defaultGeo',
-    () => new RoundedBoxGeometry(1.5, 2.1, 0.05, 4, 0.06));
+  const { w, h } = cardSize(card);
+  const geo = cached(shared, `defaultGeo:${w}x${h}`,
+    () => new RoundedBoxGeometry(w, h, 0.05, 4, 0.06));
   const edge = cached(shared, 'defaultEdge',
     () => new THREE.MeshStandardMaterial({ color: 0x3a3a3a, metalness: 0.7, roughness: 0.25 }));
   const { front, back } = loadFaces(shared, card);
@@ -167,8 +180,9 @@ function buildDefault(shared, card) {
 
 function buildGloss(shared, card) {
   const c = HOLDERS.gloss;
-  const geo = cached(shared, 'glossGeo',
-    () => new RoundedBoxGeometry(1.5, 2.1, 0.05, 4, 0.06));
+  const { w, h } = cardSize(card);
+  const geo = cached(shared, `glossGeo:${w}x${h}`,
+    () => new RoundedBoxGeometry(w, h, 0.05, 4, 0.06));
   const edge = cached(shared, 'glossEdge',
     () => new THREE.MeshStandardMaterial({
       color: c.edgeColor, metalness: 1.0, roughness: c.edgeRoughness,
@@ -196,6 +210,7 @@ function buildSlab(shared, card) {
 function buildFrame(shared, card) {
   const c = HOLDERS.frame;
   const ic = HOLDERS.innerCard;
+  const { w, h } = cardSize(card);
   const group = new THREE.Group();
 
   const chrome = cached(shared, 'frameChrome',
@@ -204,18 +219,18 @@ function buildFrame(shared, card) {
       envMapIntensity: c.chromeEnvIntensity,
     }));
   const fw = c.frameWidth, fd = c.frameDepth, r = Math.min(fw, fd) * 0.45;
-  const hbar = cached(shared, 'frameHBar',
-    () => new RoundedBoxGeometry(ic.w + 2 * fw, fw, fd, 3, r));
-  const vbar = cached(shared, 'frameVBar',
-    () => new RoundedBoxGeometry(fw, ic.h, fd, 3, r));
+  const hbar = cached(shared, `frameHBar:${w}`,
+    () => new RoundedBoxGeometry(w + 2 * fw, fw, fd, 3, r));
+  const vbar = cached(shared, `frameVBar:${h}`,
+    () => new RoundedBoxGeometry(fw, h, fd, 3, r));
 
-  const top = new THREE.Mesh(hbar, chrome); top.position.y = ic.h / 2 + fw / 2;
-  const bottom = new THREE.Mesh(hbar, chrome); bottom.position.y = -(ic.h / 2 + fw / 2);
-  const left = new THREE.Mesh(vbar, chrome); left.position.x = -(ic.w / 2 + fw / 2);
-  const right = new THREE.Mesh(vbar, chrome); right.position.x = ic.w / 2 + fw / 2;
+  const top = new THREE.Mesh(hbar, chrome); top.position.y = h / 2 + fw / 2;
+  const bottom = new THREE.Mesh(hbar, chrome); bottom.position.y = -(h / 2 + fw / 2);
+  const left = new THREE.Mesh(vbar, chrome); left.position.x = -(w / 2 + fw / 2);
+  const right = new THREE.Mesh(vbar, chrome); right.position.x = w / 2 + fw / 2;
 
   const glass = new THREE.Mesh(
-    cached(shared, 'frameGlassGeo', () => new THREE.PlaneGeometry(ic.w, ic.h)),
+    cached(shared, `frameGlassGeo:${w}x${h}`, () => new THREE.PlaneGeometry(w, h)),
     cached(shared, 'frameGlassMat',
       () => new THREE.MeshPhysicalMaterial({
         color: 0xffffff, metalness: 0, roughness: c.glassRoughness,
