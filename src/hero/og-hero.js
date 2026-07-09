@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { SCENE, buildCards } from './hero-config.js';
 import { computeScrollProgress, cardTransform, clamp } from './motion.js';
+import { resolveHolderStyle, createHolderResources, buildCardMesh } from './holders.js';
 
 export function initOgHero(container, options = {}) {
   if (!container) throw new Error('initOgHero: container is required');
@@ -36,24 +36,19 @@ export function initOgHero(container, options = {}) {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, cfg.pixelRatioCap));
   container.appendChild(renderer.domElement);
 
-  const loader = new THREE.TextureLoader();
-  const edge = new THREE.MeshStandardMaterial({ color: 0x3a3a3a, metalness: 0.7, roughness: 0.25 });
-  const geometry = new RoundedBoxGeometry(1.5, 2.1, 0.05, 4, 0.06);
+  // Holder style comes from ?ogholder=<name>; 'default' leaves the renderer and
+  // materials exactly as they were. Shiny styles reflect a procedural env map
+  // (built once, below). The renderer stays in its legacy color path on purpose
+  // so the photographic card artwork keeps the exact vividness of the default
+  // look — the shine comes from the env map + materials, not tone mapping.
+  const holderStyle = resolveHolderStyle(location.search);
+  const holders = createHolderResources(holderStyle, renderer);
+  if (holders.environment) scene.environment = holders.environment;
 
   const meshes = cards.map((card) => {
-    const front = loader.load(card.src);
-    // Same card face on the back too, mirrored horizontally so it reads
-    // upright (not reversed) when the slow spin turns the card around.
-    const back = loader.load(card.src);
-    back.wrapS = THREE.RepeatWrapping;
-    back.repeat.x = -1;
-    const materials = [edge, edge, edge, edge,
-      new THREE.MeshStandardMaterial({ map: front }),
-      new THREE.MeshStandardMaterial({ map: back })];
-    const mesh = new THREE.Mesh(geometry, materials);
-    mesh.userData.card = card;
-    scene.add(mesh);
-    return mesh;
+    const obj = buildCardMesh(card, holderStyle, holders);
+    scene.add(obj);
+    return obj;
   });
 
   const ranges = {
@@ -127,6 +122,7 @@ export function initOgHero(container, options = {}) {
       if (rafId !== null) cancelAnimationFrame(rafId);
       ro.disconnect();
       io.disconnect();
+      holders.dispose();
       renderer.dispose();
       if (renderer.domElement.parentNode) {
         renderer.domElement.parentNode.removeChild(renderer.domElement);
