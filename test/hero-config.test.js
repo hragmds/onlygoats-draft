@@ -2,8 +2,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { SCENE, CARD_LAYOUT, buildCards } from '../src/hero/hero-config.js';
 
-test('CARD_LAYOUT has 6 well-formed cards', () => {
-  assert.equal(CARD_LAYOUT.length, 6);
+test('CARD_LAYOUT has 7 well-formed cards', () => {
+  assert.equal(CARD_LAYOUT.length, 7);
   for (const c of CARD_LAYOUT) {
     for (const k of ['file', 'x', 'y', 'z', 'parallax', 'floatPhase', 'floatAmp', 'spin']) {
       assert.ok(k in c, `card missing ${k}`);
@@ -20,7 +20,7 @@ test('cards span a range of depths and parallax factors', () => {
 
 test('buildCards prefixes and URL-encodes filenames', () => {
   const cards = buildCards('/onlygoats-draft/assets/');
-  assert.equal(cards.length, 6);
+  assert.equal(cards.length, 7);
   assert.ok(cards[0].src.startsWith('/onlygoats-draft/assets/'));
   assert.ok(!cards[0].src.includes(' '), 'spaces must be encoded');
   assert.ok(cards.some((c) => c.src.includes('%20')), 'a filename with a space should encode to %20');

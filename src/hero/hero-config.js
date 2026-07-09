@@ -26,6 +26,7 @@ export const CARD_LAYOUT = [
   { file: 'Gretzky OPC front.jpg',       x:  5.8, y:  2.4, z:  1.2, rotX: -0.03, rotY: -0.26, rotZ:  0.10, parallax: 0.90, floatPhase: 1.1, floatAmp: 0.18, spin: -0.07 }, // upper-right
   { file: 'Tiger Woods Front.jpg',       x:  5.3, y: -2.6, z:  0.6, rotX: -0.02, rotY: -0.18, rotZ: -0.10, parallax: 0.80, floatPhase: 3.0, floatAmp: 0.16, spin:  0.10 }, // lower-right
   { file: 'Henderson Topps front.jpg',   x:  8.9, y:  0.2, z: -1.4, rotX:  0.00, rotY:  0.14, rotZ:  0.05, parallax: 0.45, floatPhase: 0.7, floatAmp: 0.12, spin: -0.05 }, // right, deep
+  { file: 'Kiss Comic Front.jpg',        x: -8.9, y: -0.3, z: -1.2, rotX:  0.00, rotY:  0.16, rotZ: -0.05, parallax: 0.50, floatPhase: 5.5, floatAmp: 0.13, spin:  0.08 }, // left, deep
 ];
 
 export function buildCards(basePath, layout = CARD_LAYOUT) {
